@@ -50,17 +50,16 @@ namespace Lokad.Cloud.AppHost
                 _currentDeploymentDefinition = new XElement("Deployment");
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    // 1. apply all commands
+                    // 1. run agents
+                    _deploymentPollingAgent.PollForChanges(_currentDeploymentName);
+
+                    // 2. apply all commands
                     IHostCommand command;
-                    if (_commandQueue.TryDequeue(out command))
+                    while (_commandQueue.TryDequeue(out command))
                     {
                         // dynamic dispatch, good enough for now
                         Do((dynamic)command, cancellationToken);
-                        continue;
                     }
-
-                    // 2. run agents
-                    _deploymentPollingAgent.PollForChanges(_currentDeploymentName);
 
                     // 3. repeat, but throttled
                     cancellationToken.WaitHandle.WaitOne(TimeSpan.FromSeconds(30));
