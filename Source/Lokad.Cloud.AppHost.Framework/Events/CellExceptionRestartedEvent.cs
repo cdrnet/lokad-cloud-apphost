@@ -10,13 +10,13 @@ namespace Lokad.Cloud.AppHost.Framework.Events
     /// <summary>
     /// Raised whenever the a runtime process restarts because of an unhandled exception.
     /// </summary>
-    public class CloudRuntimeExceptionProcessRestartingEvent : IHostEvent
+    public class CellExceptionRestartedEvent : IHostEvent
     {
         public Exception Exception { get; private set; }
         public string CellName { get; private set; }
         public bool FloodPrevention { get; private set; }
 
-        public CloudRuntimeExceptionProcessRestartingEvent(Exception exception, string cellName, bool floodPrevention)
+        public CellExceptionRestartedEvent(Exception exception, string cellName, bool floodPrevention)
         {
             Exception = exception;
             CellName = cellName;

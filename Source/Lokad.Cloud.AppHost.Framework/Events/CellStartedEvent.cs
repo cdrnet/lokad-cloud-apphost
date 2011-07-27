@@ -6,12 +6,15 @@
 namespace Lokad.Cloud.AppHost.Framework.Events
 {
     /// <summary>
-    /// Raised whenever the runtime detects any service settings change
+    /// Raised whenever the runtime is started
     /// </summary>
-    public class CloudRuntimeServiceSettingsChangedEvent : IHostEvent
+    public class CellStartedEvent : IHostEvent
     {
-        public CloudRuntimeServiceSettingsChangedEvent()
+        public string CellName { get; set; }
+
+        public CellStartedEvent(string cellName)
         {
+            CellName = cellName;
         }
     }
 }

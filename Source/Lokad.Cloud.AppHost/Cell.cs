@@ -25,7 +25,7 @@ namespace Lokad.Cloud.AppHost
         private readonly HostHandle _hostHandle;
         private readonly CellHandle _cellHandle;
 
-        private volatile CellProcessAppDomainEntryPoint _entryPoint;
+        private volatile CellAppDomainEntryPoint _entryPoint;
         private volatile XElement _cellDefinition;
         private volatile string _deploymentName;
 
@@ -78,18 +78,18 @@ namespace Lokad.Cloud.AppHost
                         AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + _cellHandle.CellName, null, AppDomain.CurrentDomain.SetupInformation);
                         try
                         {
-                            domain.UnhandledException += (sender, args) => _hostHandle.TryNotify(() => new CloudRuntimeExceptionProcessRestartingEvent(args.ExceptionObject as Exception, _cellHandle.CellName, false));
+                            domain.UnhandledException += (sender, args) => _hostHandle.TryNotify(() => new CellExceptionRestartedEvent(args.ExceptionObject as Exception, _cellHandle.CellName, false));
 
                             try
                             {
-                                _entryPoint = (CellProcessAppDomainEntryPoint)domain.CreateInstanceAndUnwrap(
+                                _entryPoint = (CellAppDomainEntryPoint)domain.CreateInstanceAndUnwrap(
                                     Assembly.GetExecutingAssembly().FullName,
-                                    typeof(CellProcessAppDomainEntryPoint).FullName);
+                                    typeof(CellAppDomainEntryPoint).FullName);
                             }
                             catch (Exception exception)
                             {
                                 // Fatal Error
-                                _hostHandle.TryNotify(() => new CloudRuntimeFatalErrorProcessRestartEvent(exception, _cellHandle.CellName));
+                                _hostHandle.TryNotify(() => new CellFatalErrorRestartedEvent(exception, _cellHandle.CellName));
                                 cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                                 continue;
                             }
@@ -98,7 +98,7 @@ namespace Lokad.Cloud.AppHost
                             var registration = cancellationToken.Register(_entryPoint.Cancel);
                             try
                             {
-                                _hostHandle.TryNotify(() => new CloudRuntimeCellStartedEvent(_cellHandle.CellName));
+                                _hostHandle.TryNotify(() => new CellStartedEvent(_cellHandle.CellName));
 
                                 _cellHandle.CurrentDeploymentName = _deploymentName;
                                 _cellHandle.CurretAssembliesName = _cellDefinition.SettingsElementAttributeValue("Assemblies", "name");
@@ -110,26 +110,26 @@ namespace Lokad.Cloud.AppHost
                                 _entryPoint = null;
                                 if ((DateTimeOffset.UtcNow - lastRoundStartTime) < FloodFrequencyThreshold)
                                 {
-                                    _hostHandle.TryNotify(() => new CloudRuntimeExceptionProcessRestartingEvent(exception, _cellHandle.CellName, true));
+                                    _hostHandle.TryNotify(() => new CellExceptionRestartedEvent(exception, _cellHandle.CellName, true));
                                     cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                                 }
                                 else
                                 {
-                                    _hostHandle.TryNotify(() => new CloudRuntimeExceptionProcessRestartingEvent(exception, _cellHandle.CellName, false));
+                                    _hostHandle.TryNotify(() => new CellExceptionRestartedEvent(exception, _cellHandle.CellName, false));
                                 }
                                 continue;
                             }
                             finally
                             {
                                 _entryPoint = null;
-                                _hostHandle.TryNotify(() => new CloudRuntimeCellStoppedEvent(_cellHandle.CellName));
+                                _hostHandle.TryNotify(() => new CellStoppedEvent(_cellHandle.CellName));
                                 registration.Dispose();
                             }
                         }
                         catch (Exception exception)
                         {
                             // Fatal Error
-                            _hostHandle.TryNotify(() => new CloudRuntimeFatalErrorProcessRestartEvent(exception, _cellHandle.CellName));
+                            _hostHandle.TryNotify(() => new CellFatalErrorRestartedEvent(exception, _cellHandle.CellName));
                             cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                             continue;
                         }

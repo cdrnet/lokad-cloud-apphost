@@ -6,12 +6,15 @@
 namespace Lokad.Cloud.AppHost.Framework.Events
 {
     /// <summary>
-    /// Raised whenever the runtime detects any application package assemblies change
+    /// Raised whenever the runtime is started
     /// </summary>
-    public class CloudRuntimeAppPackageChangedEvent : IHostEvent
+    public class CellStoppedEvent : IHostEvent
     {
-        public CloudRuntimeAppPackageChangedEvent()
+        public string CellName { get; set; }
+
+        public CellStoppedEvent(string cellName)
         {
+            CellName = cellName;
         }
     }
 }

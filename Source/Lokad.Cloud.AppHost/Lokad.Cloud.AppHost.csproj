@@ -60,7 +60,7 @@
     <Compile Include="Util\SettingsXml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Cell.cs" />
-    <Compile Include="CellProcessAppDomainEntryPoint.cs" />
+    <Compile Include="CellAppDomainEntryPoint.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lokad.Cloud.AppHost.Framework\Lokad.Cloud.AppHost.Framework.csproj">

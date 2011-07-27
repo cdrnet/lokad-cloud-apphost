@@ -15,7 +15,7 @@ namespace Lokad.Cloud.AppHost
     /// <summary>
     /// AppDomain Entry Point for the cell process (single use).
     /// </summary>
-    internal sealed class CellProcessAppDomainEntryPoint : MarshalByRefObject
+    internal sealed class CellAppDomainEntryPoint : MarshalByRefObject
     {
         private readonly CancellationTokenSource _externalCancellationTokenSource = new CancellationTokenSource();
         private ICellRunner _cellRunner;
