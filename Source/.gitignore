@@ -1,0 +1,7 @@
+bin
+obj
+*.user
+*.suo
+*.vsdoc
+*.cache
+_ReSharper*
