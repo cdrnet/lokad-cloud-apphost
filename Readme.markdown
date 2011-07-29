@@ -1,7 +1,7 @@
 Lokad.Cloud Application Host
 ============================
 
-Prototype for hosting Lokad.Cloud services or other applications in Windows Azure or on premise.
+Prototype for hosting Lokad.Cloud services or other applications in Windows Azure or on premises.
 
 Highlights:
 
