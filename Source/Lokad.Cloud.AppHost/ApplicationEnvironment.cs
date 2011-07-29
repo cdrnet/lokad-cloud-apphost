@@ -4,6 +4,7 @@
 #endregion
 
 using System;
+using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Commands;
 
@@ -66,6 +67,16 @@ namespace Lokad.Cloud.AppHost
         public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
         {
             SendCommand(new ProvisionWorkerInstancesAtLeastCommand(minNumberOfInstances));
+        }
+
+        public string GetConfigurationSettingValue(string settingName)
+        {
+            return _hostContext.GetConfigurationSettingValue(settingName);
+        }
+
+        public X509Certificate2 GetConfigurationCertificate(string thumbprint)
+        {
+            return _hostContext.GetConfigurationCertificate(thumbprint);
         }
 
         public void SendCommand(IHostCommand command)

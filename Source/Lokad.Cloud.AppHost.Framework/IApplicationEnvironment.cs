@@ -3,6 +3,8 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System.Security.Cryptography.X509Certificates;
+
 namespace Lokad.Cloud.AppHost.Framework
 {
     public interface IApplicationEnvironment
@@ -18,6 +20,9 @@ namespace Lokad.Cloud.AppHost.Framework
         int CurrentWorkerInstanceCount { get; }
         void ProvisionWorkerInstances(int numberOfInstances);
         void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances);
+
+        string GetConfigurationSettingValue(string settingName);
+        X509Certificate2 GetConfigurationCertificate(string thumbprint);
 
         void SendCommand(IHostCommand command);
     }

@@ -99,7 +99,7 @@ namespace Lokad.Cloud.AppHost
                     }
                 })
                 {
-                    Name = "Lokad.Cloud.ApplicationHost"
+                    Name = "Lokad.Cloud AppHost Main"
                 };
 
             thread.Start();

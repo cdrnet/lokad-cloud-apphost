@@ -143,7 +143,7 @@ namespace Lokad.Cloud.AppHost
                     completionSource.TrySetCanceled();
                 });
 
-            thread.Name = "Lokad.Cloud Cell Process (" + _cellHandle.CellName + ")";
+            thread.Name = "Lokad.Cloud AppHost Cell (" + _cellHandle.CellName + ")";
             thread.Start();
         }
 
