@@ -20,7 +20,6 @@ namespace Lokad.Cloud.AppHost
     public sealed class Host
     {
         private readonly IHostContext _hostContext;
-        private readonly IHostObserver _observer;
         private readonly HostHandle _hostHandle;
         private readonly Dictionary<string, Cell> _cells;
         private readonly ConcurrentQueue<IHostCommand> _commandQueue;
@@ -29,20 +28,19 @@ namespace Lokad.Cloud.AppHost
         private string _currentDeploymentName;
         private XElement _currentDeploymentDefinition;
 
-        public Host(IHostContext context, IHostObserver observer = null)
+        public Host(IHostContext context)
         {
             _hostContext = context;
-            _observer = observer;
             _cells = new Dictionary<string, Cell>();
             _commandQueue = new ConcurrentQueue<IHostCommand>();
             _deploymentPollingAgent = new DeploymentHeadPollingAgent(context.DeploymentReader, _commandQueue.Enqueue);
 
-            _hostHandle = new HostHandle(_commandQueue.Enqueue, observer);
+            _hostHandle = new HostHandle(_commandQueue.Enqueue);
         }
 
         public void RunSync(CancellationToken cancellationToken)
         {
-            _observer.TryNotify(() => new HostStartedEvent());
+            _hostContext.Observer.TryNotify(() => new HostStartedEvent());
 
             try
             {
@@ -67,7 +65,7 @@ namespace Lokad.Cloud.AppHost
             }
             finally
             {
-                _observer.TryNotify(() => new HostStoppedEvent());
+                _hostContext.Observer.TryNotify(() => new HostStoppedEvent());
             }
         }
 
@@ -147,6 +145,16 @@ namespace Lokad.Cloud.AppHost
             {
                 ApplyChangedDeploymentDefinition(newDeploymentDefinition, command.DeploymentName, cancellationToken);
             }
+        }
+
+        void Do(ProvisionWorkerInstancesCommand command, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        void Do(ProvisionWorkerInstancesAtLeastCommand command, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         void ApplyChangedDeploymentDefinition(XElement newDeploymentDefinition, string newDeploymentName, CancellationToken cancellationToken)

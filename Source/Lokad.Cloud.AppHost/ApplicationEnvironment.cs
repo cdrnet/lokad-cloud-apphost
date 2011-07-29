@@ -43,29 +43,29 @@ namespace Lokad.Cloud.AppHost
             get { return _cellHandle.CurretAssembliesName; }
         }
 
+        public void LoadDeployment(string deploymentName)
+        {
+            SendCommand(new LoadDeploymentCommand(deploymentName));
+        }
+
+        public void LoadCurrentHeadDeployment()
+        {
+            SendCommand(new LoadCurrentHeadDeploymentCommand());
+        }
+
         public int CurrentWorkerInstanceCount
         {
             get { return _hostContext.CurrentWorkerInstanceCount; }
         }
 
-        public void LoadDeployment(string deploymentName)
-        {
-            _hostHandle.SendCommand(new LoadDeploymentCommand(deploymentName));
-        }
-
-        public void LoadCurrentHeadDeployment()
-        {
-            _hostHandle.SendCommand(new LoadCurrentHeadDeploymentCommand());
-        }
-
         public void ProvisionWorkerInstances(int numberOfInstances)
         {
-            throw new NotImplementedException();
+            SendCommand(new ProvisionWorkerInstancesCommand(numberOfInstances));
         }
 
         public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
         {
-            throw new NotImplementedException();
+            SendCommand(new ProvisionWorkerInstancesAtLeastCommand(minNumberOfInstances));
         }
 
         public void SendCommand(IHostCommand command)

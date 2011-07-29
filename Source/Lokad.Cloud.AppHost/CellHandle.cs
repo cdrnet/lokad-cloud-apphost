@@ -7,7 +7,7 @@ namespace Lokad.Cloud.AppHost
 { 
     /// <summary>
     /// Cell-specific counterpart of the HostHandle.
-    /// Handle to communicate with the application host from the outside and the inside:
+    /// Handle to communicate with the application host from the outside:
     /// - Send commands to the host
     /// - Query (stale) info about the host (like current deployment)
     /// </summary>
