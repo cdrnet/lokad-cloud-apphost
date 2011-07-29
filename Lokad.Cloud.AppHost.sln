@@ -5,6 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lokad.Cloud.AppHost.Framewo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lokad.Cloud.AppHost", "Source\Lokad.Cloud.AppHost\Lokad.Cloud.AppHost.csproj", "{89D98EC0-6959-4B20-A8F4-9BF19B4BCF49}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AC659648-0AA8-482C-A5DA-9E49697243F2}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.markdown = Readme.markdown
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

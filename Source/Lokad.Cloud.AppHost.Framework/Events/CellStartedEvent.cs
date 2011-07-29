@@ -3,11 +3,11 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
+
 namespace Lokad.Cloud.AppHost.Framework.Events
 {
-    /// <summary>
-    /// Raised whenever the runtime is started
-    /// </summary>
+    [Serializable]
     public class CellStartedEvent : IHostEvent
     {
         public string CellName { get; set; }

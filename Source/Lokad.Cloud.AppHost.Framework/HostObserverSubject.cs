@@ -8,9 +8,9 @@ using System;
 namespace Lokad.Cloud.AppHost.Framework
 {
     /// <summary>
-    /// Cloud runtime observer that implements a hot Rx Observable, forwarding all events synchronously
+    /// Host system event observer that implements a hot Rx Observable, forwarding all events synchronously
     /// (similar to Rx's FastSubject). Use this class if you want an easy way to observe the runtime
-    /// using Rx. Alternatively you can implement your own storage observer instead, or not use any observers at all.
+    /// using Rx. Alternatively you can implement your own observer instead, or not use any observers at all.
     /// </summary>
     public class HostObserverSubject : IDisposable, IHostObserver, IObservable<IHostEvent>
     {

@@ -7,9 +7,7 @@ using System;
 
 namespace Lokad.Cloud.AppHost.Framework.Events
 {
-    /// <summary>
-    /// Raised whenever the a runtime process restarts because of an fatal error.
-    /// </summary>
+    [Serializable]
     public class CellFatalErrorRestartedEvent : IHostEvent
     {
         public Exception Exception { get; private set; }

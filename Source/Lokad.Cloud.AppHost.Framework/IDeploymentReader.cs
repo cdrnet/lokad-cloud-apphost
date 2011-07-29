@@ -7,7 +7,26 @@ using System.Xml.Linq;
 
 namespace Lokad.Cloud.AppHost.Framework
 {
-    /// <remarks>Implementation needs to be serializable to be able to cross AppDomains.</remarks>
+    /// <summary>
+    /// <para>
+    /// Deployment reader abstracts all storage access by the application host for polling
+    /// and loading application deployments. An instances of the provided class will be
+    /// forwarded to your application's CellRunner, so you can extend the class freely
+    /// to provide additional features. However, it will be serialized and then
+    /// deserialized again before it reaches CellRunner, in order to be able to cross
+    /// AppDomains.
+    /// </para>
+    /// <para>
+    /// All implementations are required to be serializable.
+    /// Do NOT derive from MarshalByRefObject.
+    /// Remember that Azure SDK Credential and Account classes are NOT serializable.
+    /// </para>
+    /// <para>
+    /// For convenience, the Lokad.Cloud Services Framework provides a complete
+    /// implementation based on Lokad.Cloud.Storage.
+    /// </para>
+    /// </summary>
+    /// <remarks>IMPORTANT: Implementations must be [Serializable].</remarks>
     public interface IDeploymentReader
     {
         XElement GetHeadIfModified(string knownETag, out string newETag);

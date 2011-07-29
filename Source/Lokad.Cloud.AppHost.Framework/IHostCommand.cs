@@ -5,6 +5,9 @@
 
 namespace Lokad.Cloud.AppHost.Framework
 {
+    /// <summary>
+    /// Host Command
+    /// </summary>
     public interface IHostCommand
     {
     }

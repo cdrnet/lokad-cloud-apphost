@@ -5,6 +5,9 @@
 
 namespace Lokad.Cloud.AppHost.Framework
 {
+    /// <summary>
+    /// Host System Event (Instrumentation)
+    /// </summary>
     public interface IHostEvent
     {
     }
