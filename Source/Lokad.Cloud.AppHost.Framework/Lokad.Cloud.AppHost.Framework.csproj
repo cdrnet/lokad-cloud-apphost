@@ -61,7 +61,7 @@
     <Compile Include="IHostContext.cs" />
     <Compile Include="IHostObserver.cs" />
     <Compile Include="IApplicationEnvironment.cs" />
-    <Compile Include="ICellRunner.cs" />
+    <Compile Include="IApplicationEntryPoint.cs" />
     <Compile Include="IHostEvent.cs" />
     <Compile Include="IHostCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

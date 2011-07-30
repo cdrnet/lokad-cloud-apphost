@@ -14,7 +14,7 @@ namespace Lokad.Cloud.AppHost.Framework
     /// are already loaded into the AppDomain at the point where the CellRunner is activated.
     /// </summary>
     /// <remarks>Must have a public constructor with not arguments.</remarks>
-    public interface ICellRunner
+    public interface IApplicationEntryPoint
     {
         /// <summary>
         /// Run is expected to block as long as the application is running, until a cancellation is requested on the provided token.

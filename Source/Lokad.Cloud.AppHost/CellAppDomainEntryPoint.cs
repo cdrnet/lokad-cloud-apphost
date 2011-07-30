@@ -18,7 +18,7 @@ namespace Lokad.Cloud.AppHost
     internal sealed class CellAppDomainEntryPoint : MarshalByRefObject
     {
         private readonly CancellationTokenSource _externalCancellationTokenSource = new CancellationTokenSource();
-        private ICellRunner _cellRunner;
+        private IApplicationEntryPoint _appEntryPoint;
 
         /// <remarks>Never run a cell process entry point more than once per AppDomain.</remarks>
         public void Run(string cellDefinitionXml, IDeploymentReader deploymentReader, ApplicationEnvironment environment)
@@ -33,10 +33,10 @@ namespace Lokad.Cloud.AppHost
             // Create Cell Runner
             var runnerTypeName = cellDefinition.SettingsElementAttributeValue("Runner", "typeName");
             var runnerType = string.IsNullOrEmpty(runnerTypeName) ? Type.GetType("Lokad.Cloud.Services.Framework.Runner.CellRunner") : Type.GetType(runnerTypeName);
-            _cellRunner = (ICellRunner)Activator.CreateInstance(runnerType);
+            _appEntryPoint = (IApplicationEntryPoint)Activator.CreateInstance(runnerType);
 
             // Run
-            _cellRunner.Run((cellDefinition.SettingsElement("Settings") ?? new XElement("Settings")), deploymentReader, environment, _externalCancellationTokenSource.Token);
+            _appEntryPoint.Run((cellDefinition.SettingsElement("Settings") ?? new XElement("Settings")), deploymentReader, environment, _externalCancellationTokenSource.Token);
         }
 
         public void Cancel()
@@ -46,7 +46,7 @@ namespace Lokad.Cloud.AppHost
 
         public void AppplyChangedSettings(string settingsXml)
         {
-            _cellRunner.ApplyChangedSettings(XElement.Parse(settingsXml));
+            _appEntryPoint.ApplyChangedSettings(XElement.Parse(settingsXml));
         }
     }
 }
