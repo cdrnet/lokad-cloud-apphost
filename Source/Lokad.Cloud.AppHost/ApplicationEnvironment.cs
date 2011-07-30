@@ -61,12 +61,12 @@ namespace Lokad.Cloud.AppHost
 
         public void ProvisionWorkerInstances(int numberOfInstances)
         {
-            _sendCommand(new ProvisionWorkerInstancesCommand(numberOfInstances));
+            _hostContext.ProvisionWorkerInstances(numberOfInstances);
         }
 
         public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
         {
-            _sendCommand(new ProvisionWorkerInstancesAtLeastCommand(minNumberOfInstances));
+            _hostContext.ProvisionWorkerInstancesAtLeast(minNumberOfInstances);
         }
 
         public string GetSettingValue(string settingName)

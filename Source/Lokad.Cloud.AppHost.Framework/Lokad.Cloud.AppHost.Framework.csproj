@@ -46,8 +46,6 @@
     <Compile Include="..\VersionAssemblyInfo.cs">
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Commands\ProvisionWorkerInstancesAtLeastCommand.cs" />
-    <Compile Include="Commands\ProvisionWorkerInstancesCommand.cs" />
     <Compile Include="HostObserverSubject.cs" />
     <Compile Include="Commands\LoadCurrentHeadDeploymentCommand.cs" />
     <Compile Include="Commands\LoadDeploymentCommand.cs" />

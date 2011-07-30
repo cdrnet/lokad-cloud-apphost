@@ -144,16 +144,6 @@ namespace Lokad.Cloud.AppHost
             }
         }
 
-        void Do(ProvisionWorkerInstancesCommand command, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        void Do(ProvisionWorkerInstancesAtLeastCommand command, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
         void ApplyChangedDeploymentDefinition(XElement newDeploymentDefinition, string newDeploymentName, CancellationToken cancellationToken)
         {
             // 0. ANALYZE CELL LAYOUT CHANGES

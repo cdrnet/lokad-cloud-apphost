@@ -24,5 +24,7 @@ namespace Lokad.Cloud.AppHost.Framework
         IHostObserver Observer { get; }
 
         int CurrentWorkerInstanceCount { get; }
+        void ProvisionWorkerInstances(int numberOfInstances);
+        void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances);
     }
 }
