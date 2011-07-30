@@ -4,7 +4,6 @@
 #endregion
 
 using System;
-using System.Net;
 using Lokad.Cloud.AppHost.Framework;
 
 namespace Lokad.Cloud.AppHost
@@ -17,7 +16,6 @@ namespace Lokad.Cloud.AppHost
     internal class HostHandle
     {
         internal readonly Action<IHostCommand> SendCommand;
-        internal readonly Lazy<string> MachineName = new Lazy<string>(Dns.GetHostName);
 
         internal HostHandle(Action<IHostCommand> sendCommand)
         {

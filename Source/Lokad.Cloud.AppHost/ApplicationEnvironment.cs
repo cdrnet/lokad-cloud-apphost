@@ -26,7 +26,7 @@ namespace Lokad.Cloud.AppHost
 
         public string MachineName
         {
-            get { return _hostHandle.MachineName.Value; }
+            get { return _cellHandle.MachineName.Value; }
         }
 
         public string CellName
