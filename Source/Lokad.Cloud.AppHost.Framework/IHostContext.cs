@@ -14,13 +14,15 @@ namespace Lokad.Cloud.AppHost.Framework
     /// <remarks>Implementation does not need to be serializable (other than the deployment reader).</remarks>
     public interface IHostContext
     {
+        string GetSettingValue(string settingName);
+        X509Certificate2 GetCertificate(string thumbprint);
+        string GetLocalResourcePath(string resourceName);
+
         IDeploymentReader DeploymentReader { get; }
 
         /// <remarks>Can be <c>null</c>.</remarks>
         IHostObserver Observer { get; }
 
         int CurrentWorkerInstanceCount { get; }
-        string GetConfigurationSettingValue(string settingName);
-        X509Certificate2 GetConfigurationCertificate(string thumbprint);
     }
 }

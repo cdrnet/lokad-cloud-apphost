@@ -71,12 +71,12 @@ namespace Lokad.Cloud.AppHost
 
         public string GetConfigurationSettingValue(string settingName)
         {
-            return _hostContext.GetConfigurationSettingValue(settingName);
+            return _hostContext.GetSettingValue(settingName);
         }
 
         public X509Certificate2 GetConfigurationCertificate(string thumbprint)
         {
-            return _hostContext.GetConfigurationCertificate(thumbprint);
+            return _hostContext.GetCertificate(thumbprint);
         }
 
         public void SendCommand(IHostCommand command)
