@@ -18,13 +18,13 @@ namespace Lokad.Cloud.AppHost.Framework
         X509Certificate2 GetCertificate(string thumbprint);
         string GetLocalResourcePath(string resourceName);
 
+        int CurrentWorkerInstanceCount { get; }
+        void ProvisionWorkerInstances(int numberOfInstances);
+        void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances);
+
         IDeploymentReader DeploymentReader { get; }
 
         /// <remarks>Can be <c>null</c>.</remarks>
         IHostObserver Observer { get; }
-
-        int CurrentWorkerInstanceCount { get; }
-        void ProvisionWorkerInstances(int numberOfInstances);
-        void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances);
     }
 }
