@@ -14,14 +14,14 @@ namespace Lokad.Cloud.AppHost
     internal class ApplicationEnvironment : MarshalByRefObject, IApplicationEnvironment
     {
         private readonly IHostContext _hostContext;
-        private readonly HostHandle _hostHandle;
         private readonly CellHandle _cellHandle;
+        private readonly Action<IHostCommand> _sendCommand;
 
-        internal ApplicationEnvironment(IHostContext hostContext, HostHandle hostHandle, CellHandle cellHandle)
+        internal ApplicationEnvironment(IHostContext hostContext, CellHandle cellHandle, Action<IHostCommand> sendCommand)
         {
             _hostContext = hostContext;
-            _hostHandle = hostHandle;
             _cellHandle = cellHandle;
+            _sendCommand = sendCommand;
         }
 
         public string MachineName
@@ -46,12 +46,12 @@ namespace Lokad.Cloud.AppHost
 
         public void LoadDeployment(string deploymentName)
         {
-            SendCommand(new LoadDeploymentCommand(deploymentName));
+            _sendCommand(new LoadDeploymentCommand(deploymentName));
         }
 
         public void LoadCurrentHeadDeployment()
         {
-            SendCommand(new LoadCurrentHeadDeploymentCommand());
+            _sendCommand(new LoadCurrentHeadDeploymentCommand());
         }
 
         public int CurrentWorkerInstanceCount
@@ -61,12 +61,12 @@ namespace Lokad.Cloud.AppHost
 
         public void ProvisionWorkerInstances(int numberOfInstances)
         {
-            SendCommand(new ProvisionWorkerInstancesCommand(numberOfInstances));
+            _sendCommand(new ProvisionWorkerInstancesCommand(numberOfInstances));
         }
 
         public void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances)
         {
-            SendCommand(new ProvisionWorkerInstancesAtLeastCommand(minNumberOfInstances));
+            _sendCommand(new ProvisionWorkerInstancesAtLeastCommand(minNumberOfInstances));
         }
 
         public string GetConfigurationSettingValue(string settingName)
@@ -81,7 +81,7 @@ namespace Lokad.Cloud.AppHost
 
         public void SendCommand(IHostCommand command)
         {
-            _hostHandle.SendCommand(command);
+            _sendCommand(command);
         }
     }
 }

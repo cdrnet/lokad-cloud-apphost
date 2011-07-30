@@ -22,17 +22,17 @@ namespace Lokad.Cloud.AppHost
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         private readonly IHostContext _hostContext;
-        private readonly HostHandle _hostHandle;
+        private readonly Action<IHostCommand> _sendCommand;
         private readonly CellHandle _cellHandle;
 
         private volatile CellAppDomainEntryPoint _entryPoint;
         private volatile XElement _cellDefinition;
         private volatile string _deploymentName;
 
-        private Cell(IHostContext hostContext, HostHandle hostHandle, XElement cellDefinition, string deploymentName, CancellationToken cancellationToken)
+        private Cell(IHostContext hostContext, Action<IHostCommand> sendCommand, XElement cellDefinition, string deploymentName, CancellationToken cancellationToken)
         {
             _hostContext = hostContext;
-            _hostHandle = hostHandle;
+            _sendCommand = sendCommand;
             _cellHandle = new CellHandle(cellDefinition.AttributeValue("name"));
             _cellDefinition = cellDefinition;
             _deploymentName = deploymentName;
@@ -41,12 +41,12 @@ namespace Lokad.Cloud.AppHost
 
         public static Cell Run(
             IHostContext hostContext,
-            HostHandle hostHandle,
+            Action<IHostCommand> sendCommand,
             XElement cellDefinition,
             string deploymentName,
             CancellationToken cancellationToken)
         {
-            var process = new Cell(hostContext, hostHandle, cellDefinition, deploymentName, cancellationToken);
+            var process = new Cell(hostContext, sendCommand, cellDefinition, deploymentName, cancellationToken);
             process.Run();
             return process;
         }
@@ -104,7 +104,7 @@ namespace Lokad.Cloud.AppHost
                                 _cellHandle.CurrentDeploymentName = _deploymentName;
                                 _cellHandle.CurretAssembliesName = _cellDefinition.SettingsElementAttributeValue("Assemblies", "name");
 
-                                _entryPoint.Run(_cellDefinition.ToString(), _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, _hostHandle, _cellHandle));
+                                _entryPoint.Run(_cellDefinition.ToString(), _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, _cellHandle, _sendCommand));
                             }
                             catch (Exception exception)
                             {

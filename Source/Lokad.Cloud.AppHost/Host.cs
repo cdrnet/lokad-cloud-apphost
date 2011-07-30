@@ -20,7 +20,6 @@ namespace Lokad.Cloud.AppHost
     public sealed class Host
     {
         private readonly IHostContext _hostContext;
-        private readonly HostHandle _hostHandle;
         private readonly Dictionary<string, Cell> _cells;
         private readonly ConcurrentQueue<IHostCommand> _commandQueue;
         private readonly DeploymentHeadPollingAgent _deploymentPollingAgent;
@@ -34,8 +33,6 @@ namespace Lokad.Cloud.AppHost
             _cells = new Dictionary<string, Cell>();
             _commandQueue = new ConcurrentQueue<IHostCommand>();
             _deploymentPollingAgent = new DeploymentHeadPollingAgent(context.DeploymentReader, _commandQueue.Enqueue);
-
-            _hostHandle = new HostHandle(_commandQueue.Enqueue);
         }
 
         public void RunSync(CancellationToken cancellationToken)
@@ -214,7 +211,7 @@ namespace Lokad.Cloud.AppHost
             foreach (var cellDefinition in added)
             {
                 var cellName = cellDefinition.AttributeValue("name");
-                _cells.Add(cellName, Cell.Run(_hostContext, _hostHandle, cellDefinition, newDeploymentName, cancellationToken));
+                _cells.Add(cellName, Cell.Run(_hostContext, _commandQueue.Enqueue, cellDefinition, newDeploymentName, cancellationToken));
             }
         }
     }
