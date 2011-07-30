@@ -69,14 +69,19 @@ namespace Lokad.Cloud.AppHost
             _sendCommand(new ProvisionWorkerInstancesAtLeastCommand(minNumberOfInstances));
         }
 
-        public string GetConfigurationSettingValue(string settingName)
+        public string GetSettingValue(string settingName)
         {
             return _hostContext.GetSettingValue(settingName);
         }
 
-        public X509Certificate2 GetConfigurationCertificate(string thumbprint)
+        public X509Certificate2 GetCertificate(string thumbprint)
         {
             return _hostContext.GetCertificate(thumbprint);
+        }
+
+        public string GetLocalResourcePath(string resourceName)
+        {
+            return _hostContext.GetLocalResourcePath(resourceName);
         }
 
         public void SendCommand(IHostCommand command)

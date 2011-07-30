@@ -21,8 +21,9 @@ namespace Lokad.Cloud.AppHost.Framework
         void ProvisionWorkerInstances(int numberOfInstances);
         void ProvisionWorkerInstancesAtLeast(int minNumberOfInstances);
 
-        string GetConfigurationSettingValue(string settingName);
-        X509Certificate2 GetConfigurationCertificate(string thumbprint);
+        string GetSettingValue(string settingName);
+        X509Certificate2 GetCertificate(string thumbprint);
+        string GetLocalResourcePath(string resourceName);
 
         void SendCommand(IHostCommand command);
     }
