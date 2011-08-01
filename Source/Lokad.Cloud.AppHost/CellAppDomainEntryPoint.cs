@@ -32,7 +32,7 @@ namespace Lokad.Cloud.AppHost
 
             // Create Cell Runner
             var runnerTypeName = cellDefinition.SettingsElementAttributeValue("Runner", "typeName");
-            var runnerType = string.IsNullOrEmpty(runnerTypeName) ? Type.GetType("Lokad.Cloud.Services.Framework.Runner.CellRunner") : Type.GetType(runnerTypeName);
+            var runnerType = string.IsNullOrEmpty(runnerTypeName) ? Type.GetType("Lokad.Cloud.Services.App.EntryPoint") : Type.GetType(runnerTypeName);
             _appEntryPoint = (IApplicationEntryPoint)Activator.CreateInstance(runnerType);
 
             // Run
