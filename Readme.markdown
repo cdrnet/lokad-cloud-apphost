@@ -19,14 +19,14 @@ Deployments
       <Cells>
         <Cell name="default">
           <Assemblies name="assemblies-sha256hex" />
-          <Runner typeName="typeName, assemblyName" />
+          <EntyPoint typeName="typeName, assemblyName" />
           <Settings>... optional, user defined ...</Settings>
         </Cell>
         <Cell name="someLokadCloudServicesCell">
           <Assemblies name="assemblies-abf563fea56543aa" />
           <Settings>
             <Config name="config-ab7875978deca56" />
-            <ServiceSettings name="settings-89054dea46c43a" />
+            <Services name="services-89054dea46c43a" />
           </Settings>
         </Cell>
       </Cells>
@@ -36,7 +36,7 @@ A deployment can define one or more named cells which will run on the same VM bu
 
 Each cell must specify the name of the assemblies package (essentialy a zip file containing all assemblies). Assemblies can be shared between cells, so you have the same cell (except the cell name) multiple times. Assemblies are expected to be named after their content hash, ideally SHA256 or SHA-1, so that assemblies associated with a name are guaranteed to never change.
 
-If your cell does not run Lokad.Cloud services you need to specify your cell runner type name in the Runner-tag. Cell runners must implement the ICellRunner interface.
+If your cell does not run Lokad.Cloud services you need to specify your cell entry point type name in the EntryPoint-tag. EntryPoints must implement the IApplicationEntryPoint interface.
 
 Optionally you can add arbitrary configuration in the Settings tag for each cell. This XElement will be provided to your CellRunner.
 

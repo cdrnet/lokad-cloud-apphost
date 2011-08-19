@@ -18,7 +18,9 @@ namespace Lokad.Cloud.AppHost.Util
                 {
                     observer.Notify(@event());
                 }
+// ReSharper disable EmptyGeneralCatchClause
                 catch
+// ReSharper restore EmptyGeneralCatchClause
                 {
                     // Suppression is intended: we can't log but also don't want to tear down just because of a failed notification
                 }
