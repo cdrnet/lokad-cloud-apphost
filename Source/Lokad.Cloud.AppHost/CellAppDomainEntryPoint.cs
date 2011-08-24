@@ -26,9 +26,9 @@ namespace Lokad.Cloud.AppHost
             var cellDefinition = XElement.Parse(cellDefinitionXml);
 
             // Load Assemblies into AppDomain
-            var assembliesBytes = deploymentReader.GetItem<byte[]>(cellDefinition.SettingsElementAttributeValue("Assemblies", "name"));
             var loader = new AssemblyLoader();
-            loader.LoadAssembliesIntoAppDomain(assembliesBytes);
+            var assemblies = deploymentReader.GetAssembliesAndSymbols(cellDefinition.SettingsElementAttributeValue("Assemblies", "name"));
+            loader.LoadAssembliesIntoAppDomain(assemblies);
 
             // Create Cell Runner
             var runnerTypeName = cellDefinition.SettingsElementAttributeValue("Runner", "typeName");

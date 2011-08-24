@@ -3,6 +3,8 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace Lokad.Cloud.AppHost.Framework
@@ -30,6 +32,8 @@ namespace Lokad.Cloud.AppHost.Framework
     public interface IDeploymentReader
     {
         XElement GetHeadIfModified(string knownETag, out string newETag);
+        XElement GetDeployment(string deploymentName);
+        IEnumerable<Tuple<string, byte[]>> GetAssembliesAndSymbols(string assembliesName);
 
         /// <summary>
         /// Expected to support at least byte[] and XElement for T.

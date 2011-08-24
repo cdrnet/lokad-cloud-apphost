@@ -7,62 +7,30 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using ICSharpCode.SharpZipLib.Zip;
 
 namespace Lokad.Cloud.AppHost.AssembyLoading
 {
     internal sealed class AssemblyLoader
     {
-        public void LoadAssembliesIntoAppDomain(byte[] assemblyZipBytes)
+        public void LoadAssembliesIntoAppDomain(IEnumerable<Tuple<string, byte[]>> assembliesAndSymbols)
         {
-            // 1. UNPACK
-
-            var assemblyBytes = new Dictionary<string, byte[]>();
+            var assemblyBytes = new List<Tuple<string, byte[]>>();
             var symbolBytes = new Dictionary<string, byte[]>();
 
-            using (var stream = new MemoryStream(assemblyZipBytes))
+            foreach (var assemblyOrSymbol in assembliesAndSymbols)
             {
-                using (var zipStream = new ZipInputStream(stream))
+                string name = assemblyOrSymbol.Item1.ToLowerInvariant();
+                var extension = Path.GetExtension(name).ToLowerInvariant();
+                switch (extension)
                 {
-                    ZipEntry entry;
-                    while ((entry = zipStream.GetNextEntry()) != null)
-                    {
-                        if (!entry.IsFile || entry.Size == 0)
-                        {
-                            continue;
-                        }
-
-                        var extension = Path.GetExtension(entry.Name).ToLowerInvariant();
-                        if (extension != ".dll" && extension != ".pdb")
-                        {
-                            continue;
-                        }
-
-                        var name = Path.GetFileNameWithoutExtension(entry.Name);
-                        var data = new byte[entry.Size];
-                        try
-                        {
-                            zipStream.Read(data, 0, data.Length);
-                        }
-                        catch (Exception)
-                        {
-                            continue;
-                        }
-
-                        switch (extension)
-                        {
-                            case ".dll":
-                                assemblyBytes.Add(name.ToLowerInvariant(), data);
-                                break;
-                            case ".pdb":
-                                symbolBytes.Add(name.ToLowerInvariant(), data);
-                                break;
-                        }
-                    }
+                    case ".dll":
+                        assemblyBytes.Add(Tuple.Create(name, assemblyOrSymbol.Item2));
+                        break;
+                    case ".pdb":
+                        symbolBytes.Add(name, assemblyOrSymbol.Item2);
+                        break;
                 }
             }
-
-            // 2. LOAD
 
             var resolver = new AssemblyResolver();
             resolver.Attach();
@@ -70,13 +38,13 @@ namespace Lokad.Cloud.AppHost.AssembyLoading
             foreach (var assembly in assemblyBytes)
             {
                 byte[] symbol;
-                if (symbolBytes.TryGetValue(assembly.Key, out symbol))
+                if (symbolBytes.TryGetValue(assembly.Item1, out symbol))
                 {
-                    Assembly.Load(assembly.Value, symbol);
+                    Assembly.Load(assembly.Item2, symbol);
                 }
                 else
                 {
-                    Assembly.Load(assembly.Value);
+                    Assembly.Load(assembly.Item2);
                 }
             }
         }

@@ -131,7 +131,7 @@ namespace Lokad.Cloud.AppHost
                 return;
             }
 
-            var newDeploymentDefinition = _hostContext.DeploymentReader.GetItem<XElement>(command.DeploymentName);
+            var newDeploymentDefinition = _hostContext.DeploymentReader.GetDeployment(command.DeploymentName);
             if (newDeploymentDefinition == null)
             {
                 // TODO: NOTIFY/LOG invalid deployment
