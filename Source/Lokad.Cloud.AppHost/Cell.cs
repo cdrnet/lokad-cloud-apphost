@@ -151,7 +151,7 @@ namespace Lokad.Cloud.AppHost
         {
             var oldCellDefinition = _cellDefinition;
             var newAssembliesName = newCellDefinition.SettingsElementAttributeValue("Assemblies", "name");
-            var newRunnerTypeName = newCellDefinition.SettingsElementAttributeValue("Runner", "typeName");
+            var newEntryPointTypeName = newCellDefinition.SettingsElementAttributeValue("EntryPoint", "typeName");
 
             _cellDefinition = newCellDefinition;
             _deploymentName = newDeploymentName;
@@ -163,10 +163,10 @@ namespace Lokad.Cloud.AppHost
             }
 
             if (oldCellDefinition.SettingsElementAttributeValue("Assemblies", "name") != newAssembliesName
-                || oldCellDefinition.SettingsElementAttributeValue("Runner", "typeName") != newRunnerTypeName)
+                || oldCellDefinition.SettingsElementAttributeValue("EntryPoint", "typeName") != newEntryPointTypeName)
             {
                 // cancel will stop the cell and unload the AppDomain, but then automatically
-                // start again with the new assemblies and runner
+                // start again with the new assemblies and entry point
                 entryPoint.Cancel();
                 return;
             }

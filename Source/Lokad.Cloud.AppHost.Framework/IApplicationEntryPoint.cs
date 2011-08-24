@@ -11,7 +11,7 @@ namespace Lokad.Cloud.AppHost.Framework
     /// <summary>
     /// This is your application's entry point, where you'd usually set up and build
     /// your IoC container, resolve your application and then run it. All your assemblies
-    /// are already loaded into the AppDomain at the point where the CellRunner is activated.
+    /// are already loaded into the AppDomain at the point where the EntryPoint is activated.
     /// </summary>
     /// <remarks>Must have a public constructor with not arguments.</remarks>
     public interface IApplicationEntryPoint

@@ -38,7 +38,7 @@ Each cell must specify the name of the assemblies package (essentialy a zip file
 
 If your cell does not run Lokad.Cloud services you need to specify your cell entry point type name in the EntryPoint-tag. EntryPoints must implement the IApplicationEntryPoint interface.
 
-Optionally you can add arbitrary configuration in the Settings tag for each cell. This XElement will be provided to your CellRunner.
+Optionally you can add arbitrary configuration in the Settings tag for each cell. This XElement will be provided to your EntryPoint.
 
 Similar to assemblies, the deployment blob is expected to be named after its content hash (SHA256 or SHA-1). A deployment can therefore never change, i.e. any change will lead to a new deployment with a new name.
 

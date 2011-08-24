@@ -13,9 +13,9 @@ namespace Lokad.Cloud.AppHost.Framework
     /// <para>
     /// Deployment reader abstracts all storage access by the application host for polling
     /// and loading application deployments. An instances of the provided class will be
-    /// forwarded to your application's CellRunner, so you can extend the class freely
+    /// forwarded to your application's EntryPoint, so you can extend the class freely
     /// to provide additional features. However, it will be serialized and then
-    /// deserialized again before it reaches CellRunner, in order to be able to cross
+    /// deserialized again before it reaches the EntryPoint, in order to be able to cross
     /// AppDomains.
     /// </para>
     /// <para>

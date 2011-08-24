@@ -30,10 +30,10 @@ namespace Lokad.Cloud.AppHost
             var assemblies = deploymentReader.GetAssembliesAndSymbols(cellDefinition.SettingsElementAttributeValue("Assemblies", "name"));
             loader.LoadAssembliesIntoAppDomain(assemblies);
 
-            // Create Cell Runner
-            var runnerTypeName = cellDefinition.SettingsElementAttributeValue("Runner", "typeName");
-            var runnerType = string.IsNullOrEmpty(runnerTypeName) ? Type.GetType("Lokad.Cloud.Services.AppEntryPoint.EntryPoint, Lokad.Cloud.Services.AppEntryPoint") : Type.GetType(runnerTypeName);
-            _appEntryPoint = (IApplicationEntryPoint)Activator.CreateInstance(runnerType);
+            // Create the EntryPoint
+            var entryPointTypeName = cellDefinition.SettingsElementAttributeValue("EntryPoint", "typeName");
+            var entryPointType = string.IsNullOrEmpty(entryPointTypeName) ? Type.GetType("Lokad.Cloud.Services.AppEntryPoint.EntryPoint, Lokad.Cloud.Services.AppEntryPoint") : Type.GetType(entryPointTypeName);
+            _appEntryPoint = (IApplicationEntryPoint)Activator.CreateInstance(entryPointType);
 
             // Run
             _appEntryPoint.Run((cellDefinition.SettingsElement("Settings") ?? new XElement("Settings")), deploymentReader, environment, _externalCancellationTokenSource.Token);
