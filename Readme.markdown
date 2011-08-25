@@ -19,7 +19,7 @@ Deployments
       <Cells>
         <Cell name="default">
           <Assemblies name="assemblies-sha256hex" />
-          <EntyPoint typeName="typeName, assemblyName" />
+          <EntryPoint typeName="typeName, assemblyName" />
           <Settings>... optional, user defined ...</Settings>
         </Cell>
         <Cell name="someLokadCloudServicesCell">
