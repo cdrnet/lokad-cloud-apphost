@@ -4,6 +4,8 @@
 #endregion
 
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.AssembyLoading;
@@ -26,17 +28,39 @@ namespace Lokad.Cloud.AppHost
             var cellDefinition = XElement.Parse(cellDefinitionXml);
 
             // Load Assemblies into AppDomain
+            var containerName = cellDefinition.SettingsElementAttributeValue("Assemblies", "name");
+            var assemblies = deploymentReader.GetAssembliesAndSymbols(containerName).ToList();
+
+            // Store files locally
+            var localPath = Path.Combine(environment.GetLocalResourcePath("Cells"),
+                cellDefinition.AttributeValue("name"));
+
+            if (Directory.Exists(localPath))
+                Directory.Delete(localPath);
+
+            Directory.CreateDirectory(localPath);
+
+            foreach (var assembly in assemblies)
+                File.WriteAllBytes(Path.Combine(localPath, assembly.Item1), assembly.Item2);
+
             var loader = new AssemblyLoader();
-            var assemblies = deploymentReader.GetAssembliesAndSymbols(cellDefinition.SettingsElementAttributeValue("Assemblies", "name"));
-            loader.LoadAssembliesIntoAppDomain(assemblies);
+            loader.LoadAssembliesIntoAppDomain(assemblies, localPath);
 
             // Create the EntryPoint
             var entryPointTypeName = cellDefinition.SettingsElementAttributeValue("EntryPoint", "typeName");
-            var entryPointType = string.IsNullOrEmpty(entryPointTypeName) ? Type.GetType("Lokad.Cloud.Services.AppEntryPoint.EntryPoint, Lokad.Cloud.Services.AppEntryPoint") : Type.GetType(entryPointTypeName);
+            if (string.IsNullOrEmpty(entryPointTypeName))
+                entryPointTypeName = "Lokad.Cloud.Services.AppEntryPoint.EntryPoint, Lokad.Cloud.Services.AppEntryPoint";
+
+            var entryPointType = Type.GetType(entryPointTypeName);
+
+            if (entryPointType == null)
+                throw new InvalidOperationException("Type " + entryPointTypeName + " not found.");
+
             _appEntryPoint = (IApplicationEntryPoint)Activator.CreateInstance(entryPointType);
 
             // Run
-            _appEntryPoint.Run((cellDefinition.SettingsElement("Settings") ?? new XElement("Settings")), deploymentReader, environment, _externalCancellationTokenSource.Token);
+            var settings = (cellDefinition.SettingsElement("Settings") ?? new XElement("Settings"));
+            _appEntryPoint.Run(settings, deploymentReader, environment, _externalCancellationTokenSource.Token);
         }
 
         public void Cancel()

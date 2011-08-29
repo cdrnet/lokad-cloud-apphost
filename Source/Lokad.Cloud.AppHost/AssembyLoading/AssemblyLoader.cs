@@ -6,46 +6,23 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Lokad.Cloud.AppHost.AssembyLoading
 {
     internal sealed class AssemblyLoader
     {
-        public void LoadAssembliesIntoAppDomain(IEnumerable<Tuple<string, byte[]>> assembliesAndSymbols)
+        public void LoadAssembliesIntoAppDomain(IEnumerable<Tuple<string, byte[]>> assembliesAndSymbols, string path)
         {
-            var assemblyBytes = new List<Tuple<string, byte[]>>();
-            var symbolBytes = new Dictionary<string, byte[]>();
-
-            foreach (var assemblyOrSymbol in assembliesAndSymbols)
-            {
-                string name = assemblyOrSymbol.Item1.ToLowerInvariant();
-                var extension = Path.GetExtension(name).ToLowerInvariant();
-                switch (extension)
-                {
-                    case ".dll":
-                        assemblyBytes.Add(Tuple.Create(name, assemblyOrSymbol.Item2));
-                        break;
-                    case ".pdb":
-                        symbolBytes.Add(name, assemblyOrSymbol.Item2);
-                        break;
-                }
-            }
-
             var resolver = new AssemblyResolver();
             resolver.Attach();
 
-            foreach (var assembly in assemblyBytes)
+            var assemblies = Directory.GetFiles(path, "*.dll").Union(Directory.GetFiles(path, "*.exe")).ToList();
+
+            foreach (var assembly in assemblies)
             {
-                byte[] symbol;
-                if (symbolBytes.TryGetValue(assembly.Item1, out symbol))
-                {
-                    Assembly.Load(assembly.Item2, symbol);
-                }
-                else
-                {
-                    Assembly.Load(assembly.Item2);
-                }
+                Assembly.LoadFile(assembly);
             }
         }
     }
