@@ -62,7 +62,7 @@
 		<XmlUpdate
 			Prefix="n" Namespace="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"
 			XmlFileName="$(AppHostPack)/Lokad.Cloud.AppHost.nuspec"
-			XPath="//package/n:metadata/n:dependencies/n:dependency[@id='Lokad.Cloud.AppHost.Framework']/@version"
+			XPath="//n:package/n:metadata/n:dependencies/n:dependency[@id='Lokad.Cloud.AppHost.Framework']/@version"
 			Value="$(FrameworkPackVersion)"/>
 	</Target>
 

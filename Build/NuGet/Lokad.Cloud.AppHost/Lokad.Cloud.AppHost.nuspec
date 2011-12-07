@@ -13,7 +13,7 @@
     <language>en-US</language>
     <tags>azure cloud host lokad</tags>
     <dependencies>
-      <dependency id="Lokad.Cloud.AppHost.Framework" version="0.0.0.0" />
+      <dependency id="Lokad.Cloud.AppHost.Framework" version="0.0.0" />
     </dependencies>
   </metadata>
 </package>
