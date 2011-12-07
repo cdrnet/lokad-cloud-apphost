@@ -40,12 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\GlobalAssemblyInfo.cs">
-      <Link>Properties\GlobalAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\VersionAssemblyInfo.cs">
-      <Link>Properties\VersionAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="HostObserverSubject.cs" />
     <Compile Include="Commands\LoadCurrentHeadDeploymentCommand.cs" />
     <Compile Include="Commands\LoadDeploymentCommand.cs" />

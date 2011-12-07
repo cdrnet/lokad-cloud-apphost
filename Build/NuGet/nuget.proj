@@ -1,0 +1,76 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildPackages" ToolsVersion="4.0">
+	<UsingTask AssemblyFile="$(MSBuildProjectDirectory)/../MSBuild/MSBuild.Community.Tasks.dll" TaskName="MSBuild.Community.Tasks.XmlUpdate" />
+	<UsingTask AssemblyFile="$(MSBuildProjectDirectory)/../MSBuild/MSBuild.Community.Tasks.dll" TaskName="MSBuild.Community.Tasks.FileUpdate" />
+
+	<PropertyGroup>
+		<Root>$(MSBuildProjectDirectory)/../..</Root>
+		<OutNuGetPackages>$(MSBuildProjectDirectory)/out</OutNuGetPackages>
+		<FrameworkOut>$(MSBuildProjectDirectory)/../../Source/Lokad.Cloud.AppHost.Framework/bin/Release</FrameworkOut>
+		<AppHostOut>$(MSBuildProjectDirectory)/../../Source/Lokad.Cloud.AppHost/bin/Release</AppHostOut>
+		<FrameworkPack>$(MSBuildProjectDirectory)/Lokad.Cloud.AppHost.Framework</FrameworkPack>
+		<AppHostPack>$(MSBuildProjectDirectory)/Lokad.Cloud.AppHost</AppHostPack>
+		<NuGetExe>$(MSBuildProjectDirectory)/../../Tools/nuget.exe</NuGetExe>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<FrameworkNet40 Include="$(FrameworkOut)/Lokad.Cloud.AppHost.Framework.dll;$(FrameworkOut)/Lokad.Cloud.AppHost.Framework.pdb" />
+		<AppHostNet40 Include="$(AppHostOut)/Lokad.Cloud.AppHost.dll;$(AppHostOut)/Lokad.Cloud.AppHost.pdb" />
+	</ItemGroup>
+	
+	<Target Name="CopyContentFiles">
+		<RemoveDir Directories="$(FrameworkPack)/content" />
+		<RemoveDir Directories="$(FrameworkPack)/lib" />
+		<Copy SourceFiles="@(FrameworkNet40)" DestinationFolder="$(FrameworkPack)/lib" />
+		<RemoveDir Directories="$(AppHostPack)/content" />
+		<RemoveDir Directories="$(AppHostPack)/lib" />
+		<Copy SourceFiles="@(AppHostNet40)" DestinationFolder="$(AppHostPack)/lib" />
+	</Target>
+
+	<Target Name="UpdateNuspec" DependsOnTargets="CopyContentFiles">
+	
+		<!-- Evaluate Assembly Identity -->
+		<GetAssemblyIdentity AssemblyFiles="$(FrameworkPack)/lib/Lokad.Cloud.AppHost.Framework.dll">
+			<Output TaskParameter="Assemblies" ItemName="FrameworkAssemblyInfo"/>
+		</GetAssemblyIdentity>
+		<GetAssemblyIdentity AssemblyFiles="$(AppHostPack)/lib/Lokad.Cloud.AppHost.dll">
+			<Output TaskParameter="Assemblies" ItemName="AppHostAssemblyInfo"/>
+		</GetAssemblyIdentity>
+		
+		<!-- Extract Assembly Versions -->
+		<PropertyGroup>
+			<FrameworkAssemblyVersion>%(FrameworkAssemblyInfo.Version)</FrameworkAssemblyVersion>
+			<AppHostAssemblyVersion>%(AppHostAssemblyInfo.Version)</AppHostAssemblyVersion>
+		</PropertyGroup>
+		
+		<!-- Package Versions (skip 4th part/build number, for semvar compliance) -->
+		<PropertyGroup>
+			<FrameworkPackVersion>$(FrameworkAssemblyVersion.Substring(0, $(FrameworkAssemblyVersion.LastIndexOf('.'))))</FrameworkPackVersion>
+			<AppHostPackVersion>$(AppHostAssemblyVersion.Substring(0, $(AppHostAssemblyVersion.LastIndexOf('.'))))</AppHostPackVersion>
+		</PropertyGroup>
+		
+		<XmlUpdate
+			Prefix="n" Namespace="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"
+			XmlFileName="$(FrameworkPack)/Lokad.Cloud.AppHost.Framework.nuspec"
+			XPath="//n:package/n:metadata/n:version"
+			Value="$(FrameworkPackVersion)"/>
+			
+		<XmlUpdate
+			Prefix="n" Namespace="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"
+			XmlFileName="$(AppHostPack)/Lokad.Cloud.AppHost.nuspec"
+			XPath="//n:package/n:metadata/n:version"
+			Value="$(AppHostPackVersion)"/>
+		<XmlUpdate
+			Prefix="n" Namespace="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"
+			XmlFileName="$(AppHostPack)/Lokad.Cloud.AppHost.nuspec"
+			XPath="//package/n:metadata/n:dependencies/n:dependency[@id='Lokad.Cloud.AppHost.Framework']/@version"
+			Value="$(FrameworkPackVersion)"/>
+	</Target>
+
+	<Target Name="BuildPackages" DependsOnTargets="UpdateNuspec">
+		<RemoveDir Directories="$(OutNuGetPackages)" />
+		<MakeDir Directories="$(OutNuGetPackages)" />
+		<Exec Command="$(NuGetExe) pack $(FrameworkPack)/Lokad.Cloud.AppHost.Framework.nuspec /Verbose /OutputDirectory $(OutNuGetPackages)" />
+		<Exec Command="$(NuGetExe) pack $(AppHostPack)/Lokad.Cloud.AppHost.nuspec /Verbose /OutputDirectory $(OutNuGetPackages)" />
+	</Target>
+
+</Project>

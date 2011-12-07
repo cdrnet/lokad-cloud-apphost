@@ -4,18 +4,19 @@
 #endregion
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("Lokad.Cloud.ApplicationHost")]
+[assembly: AssemblyTitle("Lokad.Cloud.AppHost")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCopyright("Copyright © Lokad 2011")]
 [assembly: AssemblyTrademark("")]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ce8dd376-3924-4b63-944f-a069c6c51ec2")]
+[assembly: AssemblyCompany("Lokad")]
+[assembly: AssemblyProduct("Lokad.Cloud.AppHost")]
+[assembly: AssemblyCulture("")]
+[assembly: ComVisible(false)]
 
-[assembly: InternalsVisibleTo("Lokad.Cloud.Framework.Test")]
+[assembly: AssemblyVersion("0.0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
+
+[assembly: Guid("ce8dd376-3924-4b63-944f-a069c6c51ec2")]
