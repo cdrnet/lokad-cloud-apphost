@@ -31,20 +31,8 @@ namespace Lokad.Cloud.AppHost
             var containerName = cellDefinition.SettingsElementAttributeValue("Assemblies", "name");
             var assemblies = deploymentReader.GetAssembliesAndSymbols(containerName).ToList();
 
-            // Store files locally
-            var localPath = Path.Combine(environment.GetLocalResourcePath("Cells"),
-                cellDefinition.AttributeValue("name"));
-
-            if (Directory.Exists(localPath))
-                Directory.Delete(localPath);
-
-            Directory.CreateDirectory(localPath);
-
-            foreach (var assembly in assemblies)
-                File.WriteAllBytes(Path.Combine(localPath, assembly.Item1), assembly.Item2);
-
             var loader = new AssemblyLoader();
-            loader.LoadAssembliesIntoAppDomain(assemblies, localPath);
+            loader.LoadAssembliesIntoAppDomain(assemblies, environment);
 
             // Create the EntryPoint
             var entryPointTypeName = cellDefinition.SettingsElementAttributeValue("EntryPoint", "typeName");

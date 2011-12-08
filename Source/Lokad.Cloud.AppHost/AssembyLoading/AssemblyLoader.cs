@@ -13,13 +13,29 @@ namespace Lokad.Cloud.AppHost.AssembyLoading
 {
     internal sealed class AssemblyLoader
     {
-        public void LoadAssembliesIntoAppDomain(IEnumerable<Tuple<string, byte[]>> assembliesAndSymbols, string path)
+        public void LoadAssembliesIntoAppDomain(IEnumerable<Tuple<string, byte[]>> assembliesAndSymbols, ApplicationEnvironment environment)
         {
             var resolver = new AssemblyResolver();
             resolver.Attach();
 
-            var assemblies = Directory.GetFiles(path, "*.dll").Union(Directory.GetFiles(path, "*.exe")).ToList();
+            // Store files locally, because only pure IL assemblies can be loaded directly from memory
+            var path = Path.Combine(
+                environment.GetLocalResourcePath("CellAssemblies"),
+                environment.CurrentDeploymentName,
+                environment.CellName);
 
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+
+            Directory.CreateDirectory(path);
+            foreach (var assembly in assembliesAndSymbols)
+            {
+                File.WriteAllBytes(Path.Combine(path, assembly.Item1), assembly.Item2);
+            }
+
+            var assemblies = Directory.EnumerateFiles(path, "*.dll").Concat(Directory.EnumerateFiles(path, "*.exe"));
             foreach (var assembly in assemblies)
             {
                 Assembly.LoadFile(assembly);
