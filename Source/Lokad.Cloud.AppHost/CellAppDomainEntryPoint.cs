@@ -4,7 +4,6 @@
 #endregion
 
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
@@ -30,7 +29,6 @@ namespace Lokad.Cloud.AppHost
             // Load Assemblies into AppDomain
             var containerName = cellDefinition.SettingsElementAttributeValue("Assemblies", "name");
             var assemblies = deploymentReader.GetAssembliesAndSymbols(containerName).ToList();
-
             var loader = new AssemblyLoader();
             loader.LoadAssembliesIntoAppDomain(assemblies, environment);
 
@@ -40,14 +38,15 @@ namespace Lokad.Cloud.AppHost
                 entryPointTypeName = "Lokad.Cloud.Services.AppEntryPoint.EntryPoint, Lokad.Cloud.Services.AppEntryPoint";
 
             var entryPointType = Type.GetType(entryPointTypeName);
-
             if (entryPointType == null)
+            {
                 throw new InvalidOperationException("Type " + entryPointTypeName + " not found.");
+            }
 
             _appEntryPoint = (IApplicationEntryPoint)Activator.CreateInstance(entryPointType);
 
             // Run
-            var settings = (cellDefinition.SettingsElement("Settings") ?? new XElement("Settings"));
+            var settings = (cellDefinition.Element("Settings") ?? new XElement("Settings"));
             _appEntryPoint.Run(settings, deploymentReader, environment, _externalCancellationTokenSource.Token);
         }
 
