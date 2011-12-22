@@ -20,9 +20,8 @@ namespace Lokad.Cloud.AppHost.AssembyLoading
 
             // Store files locally, because only pure IL assemblies can be loaded directly from memory
             var path = Path.Combine(
-                environment.GetLocalResourcePath("CellAssemblies"),
-                environment.CurrentDeploymentName,
-                environment.CellName);
+                environment.GetLocalResourcePath("AssembliesTemp"),
+                Guid.NewGuid().ToString("N"));
 
             if (Directory.Exists(path))
             {
