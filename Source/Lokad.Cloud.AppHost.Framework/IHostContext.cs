@@ -3,6 +3,7 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Lokad.Cloud.AppHost.Framework
@@ -21,6 +22,8 @@ namespace Lokad.Cloud.AppHost.Framework
         string GetSettingValue(string settingName);
         X509Certificate2 GetCertificate(string thumbprint);
         string GetLocalResourcePath(string resourceName);
+
+        IPEndPoint GetEndpoint(string endpointName);
 
         int CurrentWorkerInstanceCount { get; }
         void ProvisionWorkerInstances(int numberOfInstances);

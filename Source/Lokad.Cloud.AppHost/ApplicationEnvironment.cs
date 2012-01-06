@@ -4,6 +4,7 @@
 #endregion
 
 using System;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Commands;
@@ -92,6 +93,11 @@ namespace Lokad.Cloud.AppHost
         public string GetLocalResourcePath(string resourceName)
         {
             return _hostContext.GetLocalResourcePath(resourceName);
+        }
+
+        public IPEndPoint GetEndpoint(string endpointName)
+        {
+            return _hostContext.GetEndpoint(endpointName);
         }
 
         public void SendCommand(IHostCommand command)
