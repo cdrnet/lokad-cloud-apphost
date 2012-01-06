@@ -3,9 +3,6 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using System;
-using System.Net;
-
 namespace Lokad.Cloud.AppHost
 { 
     /// <summary>
@@ -16,11 +13,11 @@ namespace Lokad.Cloud.AppHost
     /// </summary>
     internal class CellHandle
     {
-        internal readonly Lazy<string> MachineName = new Lazy<string>(Dns.GetHostName);
         internal readonly string CellName;
 
         internal string CurrentDeploymentName { get; set; }
         internal string CurretAssembliesName { get; set; }
+        internal string CurrentUniqueCellInstanceName { get; set; }
 
         internal CellHandle(string cellName)
         {

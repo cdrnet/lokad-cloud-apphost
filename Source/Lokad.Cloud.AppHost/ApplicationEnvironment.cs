@@ -24,14 +24,24 @@ namespace Lokad.Cloud.AppHost
             _sendCommand = sendCommand;
         }
 
-        public string MachineName
+        public string WorkerName
         {
-            get { return _cellHandle.MachineName.Value; }
+            get { return _hostContext.WorkerName; }
+        }
+
+        public string UniqueWorkerInstanceName
+        {
+            get { return _hostContext.UniqueWorkerInstanceName; }
         }
 
         public string CellName
         {
             get { return _cellHandle.CellName; }
+        }
+
+        public string UniqueCellInstanceName
+        {
+            get { return _cellHandle.CurrentUniqueCellInstanceName; }
         }
 
         public string CurrentDeploymentName

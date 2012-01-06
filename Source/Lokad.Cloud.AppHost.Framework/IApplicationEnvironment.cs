@@ -9,8 +9,11 @@ namespace Lokad.Cloud.AppHost.Framework
 {
     public interface IApplicationEnvironment
     {
-        string MachineName { get; }
+        string WorkerName { get; }
+        string UniqueWorkerInstanceName { get; }
+
         string CellName { get; }
+        string UniqueCellInstanceName { get; }
 
         string CurrentDeploymentName { get; }
         string CurrentAssembliesName { get; }

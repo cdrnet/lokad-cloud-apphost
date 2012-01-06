@@ -103,6 +103,7 @@ namespace Lokad.Cloud.AppHost
 
                                 _cellHandle.CurrentDeploymentName = _deploymentName;
                                 _cellHandle.CurretAssembliesName = _cellDefinition.SettingsElementAttributeValue("Assemblies", "name");
+                                _cellHandle.CurrentUniqueCellInstanceName = _hostContext.GetNewUniqueCellInstanceName(_deploymentName, _cellHandle.CellName);
 
                                 _entryPoint.Run(_cellDefinition.ToString(), _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, _cellHandle, _sendCommand));
                             }
