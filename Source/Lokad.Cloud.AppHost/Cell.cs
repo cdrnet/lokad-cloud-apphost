@@ -148,7 +148,7 @@ namespace Lokad.Cloud.AppHost
             thread.Start();
         }
 
-        public void ApplyChangedCellDefinition(XElement newCellDefinition, string newDeploymentName)
+        public void OnCellDefinitionChanged(XElement newCellDefinition, string newDeploymentName)
         {
             var oldCellDefinition = _cellDefinition;
             var newAssembliesName = newCellDefinition.SettingsElementAttributeValue("Assemblies", "name");

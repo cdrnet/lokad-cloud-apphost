@@ -140,11 +140,11 @@ namespace Lokad.Cloud.AppHost
 
             if (!XNode.DeepEquals(_currentDeploymentDefinition, newDeploymentDefinition))
             {
-                ApplyChangedDeploymentDefinition(newDeploymentDefinition, command.DeploymentName, cancellationToken);
+                OnDeploymentDefinitionChanged(newDeploymentDefinition, command.DeploymentName, cancellationToken);
             }
         }
 
-        void ApplyChangedDeploymentDefinition(XElement newDeploymentDefinition, string newDeploymentName, CancellationToken cancellationToken)
+        void OnDeploymentDefinitionChanged(XElement newDeploymentDefinition, string newDeploymentName, CancellationToken cancellationToken)
         {
             // 0. ANALYZE CELL LAYOUT CHANGES
 
@@ -192,7 +192,7 @@ namespace Lokad.Cloud.AppHost
                 var oldCellDefinition = old[cellName];
                 if (!XNode.DeepEquals(newCellDefinition, oldCellDefinition))
                 {
-                    _cells[cellName].ApplyChangedCellDefinition(newCellDefinition, newDeploymentName);
+                    _cells[cellName].OnCellDefinitionChanged(newCellDefinition, newDeploymentName);
                 }
             }
 

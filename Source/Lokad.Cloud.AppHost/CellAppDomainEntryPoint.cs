@@ -57,7 +57,7 @@ namespace Lokad.Cloud.AppHost
 
         public void AppplyChangedSettings(string settingsXml)
         {
-            _appEntryPoint.ApplyChangedSettings(XElement.Parse(settingsXml));
+            _appEntryPoint.OnSettingsChanged(XElement.Parse(settingsXml));
         }
     }
 }

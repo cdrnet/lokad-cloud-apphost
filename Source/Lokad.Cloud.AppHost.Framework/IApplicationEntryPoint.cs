@@ -21,6 +21,6 @@ namespace Lokad.Cloud.AppHost.Framework
         /// </summary>
         void Run(XElement settings, IDeploymentReader deploymentReader, IApplicationEnvironment environment, CancellationToken cancellationToken);
 
-        void ApplyChangedSettings(XElement settings);
+        void OnSettingsChanged(XElement settings);
     }
 }
