@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Commands;
 using Lokad.Cloud.AppHost.Framework.Definition;
@@ -149,23 +148,32 @@ namespace Lokad.Cloud.AppHost
         {
             // 0. ANALYZE CELL LAYOUT CHANGES
 
-            var old = _currentDeploymentDefinition.Cells.ToDictionary(cellDefinition => cellDefinition.CellName);
-
             var removed = new Dictionary<string, Cell>(_cells);
             var added = new List<CellDefinition>();
             var remaining = new List<CellDefinition>();
 
-            foreach (var newCellDefinition in newDeploymentDefinition.Cells)
+            Dictionary<string, CellDefinition> old;
+            if (_currentDeploymentDefinition == null || _currentDeploymentDefinition.SolutionName != newDeploymentDefinition.SolutionName)
             {
-                var cellName = newCellDefinition.CellName;
-                if (old.ContainsKey(cellName))
+                // we do not reuse cells in completely unrelated solutions (i.e. solution name changed)
+                old = new Dictionary<string, CellDefinition>();
+                added.AddRange(newDeploymentDefinition.Cells);
+            }
+            else
+            {
+                // keep remaining cells (only touch cells that actually change in some way)
+                old = _currentDeploymentDefinition.Cells.ToDictionary(cellDefinition => cellDefinition.CellName);
+                foreach (var newCellDefinition in newDeploymentDefinition.Cells)
                 {
-                    removed.Remove(cellName);
-                    remaining.Add(newCellDefinition);
-                }
-                else
-                {
-                    added.Add(newCellDefinition);
+                    if (old.ContainsKey(newCellDefinition.CellName))
+                    {
+                        removed.Remove(newCellDefinition.CellName);
+                        remaining.Add(newCellDefinition);
+                    }
+                    else
+                    {
+                        added.Add(newCellDefinition);
+                    }
                 }
             }
 

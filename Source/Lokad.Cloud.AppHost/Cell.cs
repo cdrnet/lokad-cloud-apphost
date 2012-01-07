@@ -7,7 +7,6 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Definition;
 using Lokad.Cloud.AppHost.Framework.Events;
@@ -29,16 +28,14 @@ namespace Lokad.Cloud.AppHost
         private volatile CellAppDomainEntryPoint _entryPoint;
         private volatile CellDefinition _cellDefinition;
         private volatile SolutionHead _deployment;
-        private volatile string _solutionName;
 
         private Cell(IHostContext hostContext, Action<IHostCommand> sendCommand, CellDefinition cellDefinition, SolutionHead deployment, string solutionName, CancellationToken cancellationToken)
         {
             _hostContext = hostContext;
             _sendCommand = sendCommand;
-            _cellHandle = new CellHandle(cellDefinition.CellName);
+            _cellHandle = new CellHandle(cellDefinition.CellName, solutionName);
             _cellDefinition = cellDefinition;
             _deployment = deployment;
-            _solutionName = solutionName;
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         }
 
@@ -105,10 +102,9 @@ namespace Lokad.Cloud.AppHost
                             {
                                 observer.TryNotify(() => new CellStartedEvent(_cellHandle.CellName));
 
-                                _cellHandle.SolutionName = _solutionName;
                                 _cellHandle.CurrentDeployment = _deployment;
                                 _cellHandle.CurretAssemblies = _cellDefinition.Assemblies;
-                                _cellHandle.CurrentUniqueCellInstanceName = _hostContext.GetNewUniqueCellInstanceName(_solutionName, _cellHandle.CellName, _deployment);
+                                _cellHandle.CurrentUniqueCellInstanceName = _hostContext.GetNewUniqueCellInstanceName(_cellHandle.SolutionName, _cellHandle.CellName, _deployment);
 
                                 _entryPoint.Run(_cellDefinition, _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, _cellHandle, _sendCommand));
                             }

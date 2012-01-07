@@ -15,15 +15,16 @@ namespace Lokad.Cloud.AppHost
     /// </summary>
     internal class CellHandle
     {
-        internal string SolutionName;
+        internal readonly string SolutionName;
         internal readonly string CellName;
 
         internal SolutionHead CurrentDeployment { get; set; }
         internal AssembliesHead CurretAssemblies { get; set; }
         internal string CurrentUniqueCellInstanceName { get; set; }
 
-        internal CellHandle(string cellName)
+        internal CellHandle(string solutionName, string cellName)
         {
+            SolutionName = solutionName;
             CellName = cellName;
         }
     }
