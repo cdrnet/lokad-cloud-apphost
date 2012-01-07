@@ -3,6 +3,8 @@
 // URL: http://www.lokad.com/
 #endregion
 
+using Lokad.Cloud.AppHost.Framework.Definition;
+
 namespace Lokad.Cloud.AppHost
 { 
     /// <summary>
@@ -13,10 +15,11 @@ namespace Lokad.Cloud.AppHost
     /// </summary>
     internal class CellHandle
     {
+        internal string SolutionName;
         internal readonly string CellName;
 
-        internal string CurrentDeploymentName { get; set; }
-        internal string CurretAssembliesName { get; set; }
+        internal SolutionHead CurrentDeployment { get; set; }
+        internal AssembliesHead CurretAssemblies { get; set; }
         internal string CurrentUniqueCellInstanceName { get; set; }
 
         internal CellHandle(string cellName)

@@ -3,9 +3,8 @@
 // URL: http://www.lokad.com/
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
+using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.AppHost.Framework
 {
@@ -31,9 +30,9 @@ namespace Lokad.Cloud.AppHost.Framework
     /// <remarks>IMPORTANT: Implementations must be [Serializable].</remarks>
     public interface IDeploymentReader
     {
-        XElement GetHeadIfModified(string knownETag, out string newETag);
-        XElement GetDeployment(string deploymentName);
-        IEnumerable<Tuple<string, byte[]>> GetAssembliesAndSymbols(string assembliesName);
+        SolutionHead GetHeadIfModified(string knownETag, out string newETag);
+        SolutionDefinition GetDeployment(SolutionHead deployment);
+        IEnumerable<AssemblyData> GetAssembliesAndSymbols(AssembliesHead assemblies);
 
         /// <summary>
         /// Expected to support at least byte[] and XElement for T.

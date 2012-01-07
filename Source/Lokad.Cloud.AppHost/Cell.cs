@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
+using Lokad.Cloud.AppHost.Framework.Definition;
 using Lokad.Cloud.AppHost.Framework.Events;
 using Lokad.Cloud.AppHost.Util;
 
@@ -26,27 +27,30 @@ namespace Lokad.Cloud.AppHost
         private readonly CellHandle _cellHandle;
 
         private volatile CellAppDomainEntryPoint _entryPoint;
-        private volatile XElement _cellDefinition;
-        private volatile string _deploymentName;
+        private volatile CellDefinition _cellDefinition;
+        private volatile SolutionHead _deployment;
+        private volatile string _solutionName;
 
-        private Cell(IHostContext hostContext, Action<IHostCommand> sendCommand, XElement cellDefinition, string deploymentName, CancellationToken cancellationToken)
+        private Cell(IHostContext hostContext, Action<IHostCommand> sendCommand, CellDefinition cellDefinition, SolutionHead deployment, string solutionName, CancellationToken cancellationToken)
         {
             _hostContext = hostContext;
             _sendCommand = sendCommand;
-            _cellHandle = new CellHandle(cellDefinition.AttributeValue("name"));
+            _cellHandle = new CellHandle(cellDefinition.CellName);
             _cellDefinition = cellDefinition;
-            _deploymentName = deploymentName;
+            _deployment = deployment;
+            _solutionName = solutionName;
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         }
 
         public static Cell Run(
             IHostContext hostContext,
             Action<IHostCommand> sendCommand,
-            XElement cellDefinition,
-            string deploymentName,
+            CellDefinition cellDefinition,
+            SolutionHead deployment,
+            string solutionName,
             CancellationToken cancellationToken)
         {
-            var process = new Cell(hostContext, sendCommand, cellDefinition, deploymentName, cancellationToken);
+            var process = new Cell(hostContext, sendCommand, cellDefinition, deployment, solutionName, cancellationToken);
             process.Run();
             return process;
         }
@@ -101,11 +105,12 @@ namespace Lokad.Cloud.AppHost
                             {
                                 observer.TryNotify(() => new CellStartedEvent(_cellHandle.CellName));
 
-                                _cellHandle.CurrentDeploymentName = _deploymentName;
-                                _cellHandle.CurretAssembliesName = _cellDefinition.SettingsElementAttributeValue("Assemblies", "name");
-                                _cellHandle.CurrentUniqueCellInstanceName = _hostContext.GetNewUniqueCellInstanceName(_deploymentName, _cellHandle.CellName);
+                                _cellHandle.SolutionName = _solutionName;
+                                _cellHandle.CurrentDeployment = _deployment;
+                                _cellHandle.CurretAssemblies = _cellDefinition.Assemblies;
+                                _cellHandle.CurrentUniqueCellInstanceName = _hostContext.GetNewUniqueCellInstanceName(_solutionName, _cellHandle.CellName, _deployment);
 
-                                _entryPoint.Run(_cellDefinition.ToString(), _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, _cellHandle, _sendCommand));
+                                _entryPoint.Run(_cellDefinition, _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, _cellHandle, _sendCommand));
                             }
                             catch (Exception exception)
                             {
@@ -148,14 +153,14 @@ namespace Lokad.Cloud.AppHost
             thread.Start();
         }
 
-        public void OnCellDefinitionChanged(XElement newCellDefinition, string newDeploymentName)
+        public void OnCellDefinitionChanged(CellDefinition newCellDefinition, SolutionHead newDeployment)
         {
             var oldCellDefinition = _cellDefinition;
-            var newAssembliesName = newCellDefinition.SettingsElementAttributeValue("Assemblies", "name");
-            var newEntryPointTypeName = newCellDefinition.SettingsElementAttributeValue("EntryPoint", "typeName");
+            var newAssemblies = newCellDefinition.Assemblies;
+            var newEntryPointTypeName = newCellDefinition.EntryPointTypeName;
 
             _cellDefinition = newCellDefinition;
-            _deploymentName = newDeploymentName;
+            _deployment = newDeployment;
 
             var entryPoint = _entryPoint;
             if (entryPoint == null)
@@ -163,8 +168,8 @@ namespace Lokad.Cloud.AppHost
                 return;
             }
 
-            if (oldCellDefinition.SettingsElementAttributeValue("Assemblies", "name") != newAssembliesName
-                || oldCellDefinition.SettingsElementAttributeValue("EntryPoint", "typeName") != newEntryPointTypeName)
+            if (!oldCellDefinition.Assemblies.Equals(newAssemblies)
+                || !StringComparer.Ordinal.Equals(oldCellDefinition.EntryPointTypeName, newEntryPointTypeName))
             {
                 // cancel will stop the cell and unload the AppDomain, but then automatically
                 // start again with the new assemblies and entry point
@@ -172,7 +177,7 @@ namespace Lokad.Cloud.AppHost
                 return;
             }
 
-            entryPoint.AppplyChangedSettings((newCellDefinition.Element("Settings") ?? new XElement("Settings")).ToString());
+            entryPoint.AppplyChangedSettings(newCellDefinition.SettingsXml);
         }
     }
 }

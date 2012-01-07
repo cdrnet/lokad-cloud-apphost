@@ -5,6 +5,7 @@
 
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.AppHost.Framework
 {
@@ -16,9 +17,10 @@ namespace Lokad.Cloud.AppHost.Framework
         string CellName { get; }
         string UniqueCellInstanceName { get; }
 
-        string CurrentDeploymentName { get; }
-        string CurrentAssembliesName { get; }
-        void LoadDeployment(string deploymentName);
+        string SolutionName { get; }
+        SolutionHead CurrentDeployment { get;  }
+        AssembliesHead CurrentAssemblies { get; }
+        void LoadDeployment(SolutionHead deployment);
         void LoadCurrentHeadDeployment();
 
         int CurrentWorkerInstanceCount { get; }

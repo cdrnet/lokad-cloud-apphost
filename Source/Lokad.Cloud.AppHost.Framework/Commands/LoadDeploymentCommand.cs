@@ -4,17 +4,18 @@
 #endregion
 
 using System;
+using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.AppHost.Framework.Commands
 {
     [Serializable]
     public sealed class LoadDeploymentCommand : IHostCommand
     {
-        public string DeploymentName { get; private set; }
+        public SolutionHead Deployment { get; private set; }
 
-        public LoadDeploymentCommand(string deploymentName)
+        public LoadDeploymentCommand(SolutionHead deployment)
         {
-            DeploymentName = deploymentName;
+            Deployment = deployment;
         }
     }
 }

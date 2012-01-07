@@ -9,7 +9,7 @@ using System.Threading;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.AssembyLoading;
 using Lokad.Cloud.AppHost.Framework;
-using Lokad.Cloud.AppHost.Util;
+using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.AppHost
 {
@@ -22,20 +22,19 @@ namespace Lokad.Cloud.AppHost
         private IApplicationEntryPoint _appEntryPoint;
 
         /// <remarks>Never run a cell process entry point more than once per AppDomain.</remarks>
-        public void Run(string cellDefinitionXml, IDeploymentReader deploymentReader, ApplicationEnvironment environment)
+        public void Run(CellDefinition cellDefinition, IDeploymentReader deploymentReader, ApplicationEnvironment environment)
         {
-            var cellDefinition = XElement.Parse(cellDefinitionXml);
-
             // Load Assemblies into AppDomain
-            var containerName = cellDefinition.SettingsElementAttributeValue("Assemblies", "name");
-            var assemblies = deploymentReader.GetAssembliesAndSymbols(containerName).ToList();
+            var assemblies = deploymentReader.GetAssembliesAndSymbols(cellDefinition.Assemblies).ToList();
             var loader = new AssemblyLoader();
             loader.LoadAssembliesIntoAppDomain(assemblies, environment);
 
             // Create the EntryPoint
-            var entryPointTypeName = cellDefinition.SettingsElementAttributeValue("EntryPoint", "typeName");
+            var entryPointTypeName = cellDefinition.EntryPointTypeName;
             if (string.IsNullOrEmpty(entryPointTypeName))
+            {
                 entryPointTypeName = "Lokad.Cloud.Services.AppEntryPoint.EntryPoint, Lokad.Cloud.Services.AppEntryPoint";
+            }
 
             var entryPointType = Type.GetType(entryPointTypeName);
             if (entryPointType == null)
@@ -45,8 +44,9 @@ namespace Lokad.Cloud.AppHost
 
             _appEntryPoint = (IApplicationEntryPoint)Activator.CreateInstance(entryPointType);
 
+            var settings = string.IsNullOrEmpty(cellDefinition.SettingsXml) ? new XElement("Settings") : XElement.Parse(cellDefinition.SettingsXml);
+
             // Run
-            var settings = (cellDefinition.Element("Settings") ?? new XElement("Settings"));
             _appEntryPoint.Run(settings, deploymentReader, environment, _externalCancellationTokenSource.Token);
         }
 

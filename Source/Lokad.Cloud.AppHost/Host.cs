@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Commands;
+using Lokad.Cloud.AppHost.Framework.Definition;
 using Lokad.Cloud.AppHost.Framework.Events;
 using Lokad.Cloud.AppHost.Util;
 
@@ -24,8 +25,8 @@ namespace Lokad.Cloud.AppHost
         private readonly ConcurrentQueue<IHostCommand> _commandQueue;
         private readonly DeploymentHeadPollingAgent _deploymentPollingAgent;
         
-        private string _currentDeploymentName;
-        private XElement _currentDeploymentDefinition;
+        private SolutionHead _currentDeployment;
+        private SolutionDefinition _currentDeploymentDefinition;
 
         public Host(IHostContext context)
         {
@@ -41,12 +42,12 @@ namespace Lokad.Cloud.AppHost
 
             try
             {
-                _currentDeploymentName = null;
-                _currentDeploymentDefinition = new XElement("Deployment");
+                _currentDeployment = null;
+                _currentDeploymentDefinition = null;
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     // 1. run agents
-                    _deploymentPollingAgent.PollForChanges(_currentDeploymentName);
+                    _deploymentPollingAgent.PollForChanges(_currentDeployment);
 
                     // 2. apply all commands
                     IHostCommand command;
@@ -114,7 +115,7 @@ namespace Lokad.Cloud.AppHost
                 return;
             }
 
-            _deploymentPollingAgent.PollForChanges(_currentDeploymentName);
+            _deploymentPollingAgent.PollForChanges(_currentDeployment);
         }
 
         void Do(LoadDeploymentCommand command, CancellationToken cancellationToken)
@@ -124,41 +125,39 @@ namespace Lokad.Cloud.AppHost
                 return;
             }
 
-            var current = _currentDeploymentName;
-            if (current != null && command.DeploymentName == current)
+            var current = _currentDeployment;
+            if (current != null && current.Equals(command.Deployment))
             {
                 // already on requested deployment
                 return;
             }
 
-            var newDeploymentDefinition = _hostContext.DeploymentReader.GetDeployment(command.DeploymentName);
+            var newDeploymentDefinition = _hostContext.DeploymentReader.GetDeployment(command.Deployment);
             if (newDeploymentDefinition == null)
             {
                 // TODO: NOTIFY/LOG invalid deployment
                 return;
             }
 
-            if (!XNode.DeepEquals(_currentDeploymentDefinition, newDeploymentDefinition))
+            if (_currentDeploymentDefinition == null || !_currentDeploymentDefinition.Equals(newDeploymentDefinition))
             {
-                OnDeploymentDefinitionChanged(newDeploymentDefinition, command.DeploymentName, cancellationToken);
+                OnDeploymentDefinitionChanged(newDeploymentDefinition, command.Deployment, cancellationToken);
             }
         }
 
-        void OnDeploymentDefinitionChanged(XElement newDeploymentDefinition, string newDeploymentName, CancellationToken cancellationToken)
+        void OnDeploymentDefinitionChanged(SolutionDefinition newDeploymentDefinition, SolutionHead newDeployment, CancellationToken cancellationToken)
         {
             // 0. ANALYZE CELL LAYOUT CHANGES
 
-            var old = _currentDeploymentDefinition
-                .SettingsElements("Cells", "Cell")
-                .ToDictionary(cellDefinition => cellDefinition.AttributeValue("name"));
+            var old = _currentDeploymentDefinition.Cells.ToDictionary(cellDefinition => cellDefinition.CellName);
 
             var removed = new Dictionary<string, Cell>(_cells);
-            var added = new List<XElement>();
-            var remaining = new List<XElement>();
+            var added = new List<CellDefinition>();
+            var remaining = new List<CellDefinition>();
 
-            foreach (var newCellDefinition in newDeploymentDefinition.SettingsElements("Cells", "Cell"))
+            foreach (var newCellDefinition in newDeploymentDefinition.Cells)
             {
-                var cellName = newCellDefinition.AttributeValue("name");
+                var cellName = newCellDefinition.CellName;
                 if (old.ContainsKey(cellName))
                 {
                     removed.Remove(cellName);
@@ -173,7 +172,7 @@ namespace Lokad.Cloud.AppHost
             // 1. UPDATE
 
             _currentDeploymentDefinition = newDeploymentDefinition;
-            _currentDeploymentName = newDeploymentName;
+            _currentDeployment = newDeployment;
 
             // 2. REMOVE CELLS NO LONGER PRESENT
 
@@ -188,11 +187,11 @@ namespace Lokad.Cloud.AppHost
 
             foreach (var newCellDefinition in remaining)
             {
-                var cellName = newCellDefinition.AttributeValue("name");
+                var cellName = newCellDefinition.CellName;
                 var oldCellDefinition = old[cellName];
-                if (!XNode.DeepEquals(newCellDefinition, oldCellDefinition))
+                if (!newCellDefinition.Equals(oldCellDefinition))
                 {
-                    _cells[cellName].OnCellDefinitionChanged(newCellDefinition, newDeploymentName);
+                    _cells[cellName].OnCellDefinitionChanged(newCellDefinition, newDeployment);
                 }
             }
 
@@ -200,8 +199,8 @@ namespace Lokad.Cloud.AppHost
 
             foreach (var cellDefinition in added)
             {
-                var cellName = cellDefinition.AttributeValue("name");
-                _cells.Add(cellName, Cell.Run(_hostContext, _commandQueue.Enqueue, cellDefinition, newDeploymentName, cancellationToken));
+                var cellName = cellDefinition.CellName;
+                _cells.Add(cellName, Cell.Run(_hostContext, _commandQueue.Enqueue, cellDefinition, newDeployment, newDeploymentDefinition.SolutionName, cancellationToken));
             }
         }
     }

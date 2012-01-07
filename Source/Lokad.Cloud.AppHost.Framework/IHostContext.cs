@@ -5,6 +5,7 @@
 
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.AppHost.Framework
 {
@@ -17,7 +18,7 @@ namespace Lokad.Cloud.AppHost.Framework
     {
         string WorkerName { get; }
         string UniqueWorkerInstanceName { get; }
-        string GetNewUniqueCellInstanceName(string deploymentName, string cellName);
+        string GetNewUniqueCellInstanceName(string solutionName, string cellName, SolutionHead deployment);
 
         string GetSettingValue(string settingName);
         X509Certificate2 GetCertificate(string thumbprint);

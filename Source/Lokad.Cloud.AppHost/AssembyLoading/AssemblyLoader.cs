@@ -8,12 +8,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Lokad.Cloud.AppHost.Framework;
 
 namespace Lokad.Cloud.AppHost.AssembyLoading
 {
     internal sealed class AssemblyLoader
     {
-        public void LoadAssembliesIntoAppDomain(IEnumerable<Tuple<string, byte[]>> assembliesAndSymbols, ApplicationEnvironment environment)
+        public void LoadAssembliesIntoAppDomain(IEnumerable<AssemblyData> assembliesAndSymbols, ApplicationEnvironment environment)
         {
             var resolver = new AssemblyResolver();
             resolver.Attach();
@@ -31,7 +32,7 @@ namespace Lokad.Cloud.AppHost.AssembyLoading
             Directory.CreateDirectory(path);
             foreach (var assembly in assembliesAndSymbols)
             {
-                File.WriteAllBytes(Path.Combine(path, assembly.Item1), assembly.Item2);
+                File.WriteAllBytes(Path.Combine(path, assembly.Name), assembly.Bytes);
             }
 
             var assemblies = Directory.EnumerateFiles(path, "*.dll").Concat(Directory.EnumerateFiles(path, "*.exe"));

@@ -6,7 +6,7 @@
 using System;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Commands;
-using Lokad.Cloud.AppHost.Util;
+using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.AppHost
 {
@@ -15,7 +15,8 @@ namespace Lokad.Cloud.AppHost
         private readonly IDeploymentReader _deploymentReader;
 
         private readonly Action<IHostCommand> _sendCommand;
-        private string _knownHeadDeployment, _knownHeadEtag;
+        private SolutionHead _knownHead;
+        private string _knownHeadEtag;
 
         public DeploymentHeadPollingAgent(IDeploymentReader deploymentReader, Action<IHostCommand> sendCommand)
         {
@@ -23,30 +24,28 @@ namespace Lokad.Cloud.AppHost
             _sendCommand = sendCommand;
         }
 
-        public void PollForChanges(string currentlyLoadedDeoplymentName = null)
+        public void PollForChanges(SolutionHead currentlyLoadedDeoplyment = null)
         {
             string newEtag;
             var head = _deploymentReader.GetHeadIfModified(_knownHeadEtag, out newEtag);
             if (head == null)
             {
-                if (_knownHeadDeployment != null && _knownHeadDeployment != currentlyLoadedDeoplymentName)
+                if (_knownHead != null && currentlyLoadedDeoplyment != null && _knownHead.SolutionId != currentlyLoadedDeoplyment.SolutionId)
                 {
                     // HEAD has not changed (or is missing), yet the provided current deployment
                     // doesn't match the HEAD as we know it and have last seen it -> LOAD
-                    _sendCommand(new LoadDeploymentCommand(_knownHeadDeployment));
+                    _sendCommand(new LoadDeploymentCommand(_knownHead));
                 }
 
                 return;
             }
 
-            var deploymentName = head.SettingsElementAttributeValue("Deployment", "name");
-
             _knownHeadEtag = newEtag;
-            _knownHeadDeployment = deploymentName;
+            _knownHead = head;
 
-            if (currentlyLoadedDeoplymentName != deploymentName)
+            if (currentlyLoadedDeoplyment == null || currentlyLoadedDeoplyment.SolutionId != head.SolutionId)
             {
-                _sendCommand(new LoadDeploymentCommand(deploymentName));
+                _sendCommand(new LoadDeploymentCommand(head));
             }
         }
     }

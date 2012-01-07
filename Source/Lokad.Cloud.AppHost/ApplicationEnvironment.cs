@@ -8,6 +8,7 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Commands;
+using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.AppHost
 {
@@ -45,19 +46,24 @@ namespace Lokad.Cloud.AppHost
             get { return _cellHandle.CurrentUniqueCellInstanceName; }
         }
 
-        public string CurrentDeploymentName
+        public string SolutionName
         {
-            get { return _cellHandle.CurrentDeploymentName; }
+            get { return _cellHandle.SolutionName; }
         }
 
-        public string CurrentAssembliesName
+        public SolutionHead CurrentDeployment
         {
-            get { return _cellHandle.CurretAssembliesName; }
+            get { return _cellHandle.CurrentDeployment; }
         }
 
-        public void LoadDeployment(string deploymentName)
+        public AssembliesHead CurrentAssemblies
         {
-            _sendCommand(new LoadDeploymentCommand(deploymentName));
+            get { return _cellHandle.CurretAssemblies; }
+        }
+
+        public void LoadDeployment(SolutionHead deployment)
+        {
+            _sendCommand(new LoadDeploymentCommand(deployment));
         }
 
         public void LoadCurrentHeadDeployment()
