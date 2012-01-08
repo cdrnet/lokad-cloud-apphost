@@ -14,10 +14,10 @@ namespace Lokad.Cloud.AppHost.Framework
         string WorkerName { get; }
         string UniqueWorkerInstanceName { get; }
 
+        string SolutionName { get; }
         string CellName { get; }
         string UniqueCellInstanceName { get; }
 
-        string SolutionName { get; }
         SolutionHead CurrentDeployment { get;  }
         AssembliesHead CurrentAssemblies { get; }
         void LoadDeployment(SolutionHead deployment);

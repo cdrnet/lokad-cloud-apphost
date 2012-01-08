@@ -10,9 +10,9 @@ namespace Lokad.Cloud.AppHost.Framework.Events
     [Serializable]
     public class CellStoppedEvent : IHostEvent
     {
-        public CellInstanceIdentity Cell { get; private set; }
+        public CellLifeIdentity Cell { get; private set; }
 
-        public CellStoppedEvent(CellInstanceIdentity cell)
+        public CellStoppedEvent(CellLifeIdentity cell)
         {
             Cell = cell;
         }

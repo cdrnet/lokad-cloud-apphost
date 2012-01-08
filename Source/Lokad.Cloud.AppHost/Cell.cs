@@ -21,9 +21,11 @@ namespace Lokad.Cloud.AppHost
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
+        private readonly string _solutionName;
+        private readonly string _cellName;
+
         private readonly IHostContext _hostContext;
         private readonly Action<IHostCommand> _sendCommand;
-        private readonly CellHandle _cellHandle;
 
         private volatile CellAppDomainEntryPoint _entryPoint;
         private volatile CellDefinition _cellDefinition;
@@ -33,7 +35,8 @@ namespace Lokad.Cloud.AppHost
         {
             _hostContext = hostContext;
             _sendCommand = sendCommand;
-            _cellHandle = new CellHandle(cellDefinition.CellName, solutionName);
+            _solutionName = solutionName;
+            _cellName = cellDefinition.CellName;
             _cellDefinition = cellDefinition;
             _deployment = deployment;
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -77,11 +80,9 @@ namespace Lokad.Cloud.AppHost
                         var lastRoundStartTime = currentRoundStartTime;
                         currentRoundStartTime = DateTimeOffset.UtcNow;
 
-                        _cellHandle.CurrentDeployment = _deployment;
-                        _cellHandle.CurrentAssemblies = _cellDefinition.Assemblies;
-                        _cellHandle.CurrentIdentity = _hostContext.GetNewUniqueCellIdentity(_cellHandle.SolutionName, _cellHandle.CellName, _deployment);
+                        var identity = _hostContext.GetNewUniqueCellIdentity(_solutionName, _cellName, _deployment);
 
-                        AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + _cellHandle.CurrentIdentity.UniqueCellInstanceName, null, AppDomain.CurrentDomain.SetupInformation);
+                        AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + identity.UniqueCellInstanceName, null, AppDomain.CurrentDomain.SetupInformation);
                         try
                         {
                             //domain.UnhandledException += (sender, args) => observer.TryNotify(() => new CellExceptionRestartedEvent(args.ExceptionObject as Exception, _cellHandle.CellName, false));
@@ -95,7 +96,7 @@ namespace Lokad.Cloud.AppHost
                             catch (Exception exception)
                             {
                                 // Fatal Error
-                                observer.TryNotify(() => new CellFatalErrorRestartedEvent(_cellHandle.CurrentIdentity, exception));
+                                observer.TryNotify(() => new CellFatalErrorRestartedEvent(identity, exception));
                                 cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                                 continue;
                             }
@@ -104,34 +105,34 @@ namespace Lokad.Cloud.AppHost
                             var registration = cancellationToken.Register(_entryPoint.Cancel);
                             try
                             {
-                                observer.TryNotify(() => new CellStartedEvent(_cellHandle.CurrentIdentity));
-                                _entryPoint.Run(_cellDefinition, _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, _cellHandle, _sendCommand));
+                                observer.TryNotify(() => new CellStartedEvent(identity));
+                                _entryPoint.Run(_cellDefinition, _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, identity, _deployment, _cellDefinition.Assemblies, _sendCommand));
                             }
                             catch (Exception exception)
                             {
                                 _entryPoint = null;
                                 if ((DateTimeOffset.UtcNow - lastRoundStartTime) < FloodFrequencyThreshold)
                                 {
-                                    observer.TryNotify(() => new CellExceptionRestartedEvent(_cellHandle.CurrentIdentity, exception, true));
+                                    observer.TryNotify(() => new CellExceptionRestartedEvent(identity, exception, true));
                                     cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                                 }
                                 else
                                 {
-                                    observer.TryNotify(() => new CellExceptionRestartedEvent(_cellHandle.CurrentIdentity, exception, false));
+                                    observer.TryNotify(() => new CellExceptionRestartedEvent(identity, exception, false));
                                 }
                                 continue;
                             }
                             finally
                             {
                                 _entryPoint = null;
-                                observer.TryNotify(() => new CellStoppedEvent(_cellHandle.CurrentIdentity));
+                                observer.TryNotify(() => new CellStoppedEvent(identity));
                                 registration.Dispose();
                             }
                         }
                         catch (Exception exception)
                         {
                             // Fatal Error
-                            observer.TryNotify(() => new CellFatalErrorRestartedEvent(_cellHandle.CurrentIdentity, exception));
+                            observer.TryNotify(() => new CellFatalErrorRestartedEvent(identity, exception));
                             cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                             continue;
                         }
@@ -144,7 +145,7 @@ namespace Lokad.Cloud.AppHost
                     completionSource.TrySetCanceled();
                 });
 
-            thread.Name = "Lokad.Cloud AppHost Cell (" + _cellHandle.CellName + ")";
+            thread.Name = "Lokad.Cloud AppHost Cell (" +_cellName + ")";
             thread.Start();
         }
 

@@ -16,13 +16,17 @@ namespace Lokad.Cloud.AppHost
     internal class ApplicationEnvironment : MarshalByRefObject, IApplicationEnvironment
     {
         private readonly IHostContext _hostContext;
-        private readonly CellHandle _cellHandle;
+        private readonly CellLifeIdentity _cellIdentity;
+        private readonly SolutionHead _solution;
+        private readonly AssembliesHead _assemblies;
         private readonly Action<IHostCommand> _sendCommand;
 
-        internal ApplicationEnvironment(IHostContext hostContext, CellHandle cellHandle, Action<IHostCommand> sendCommand)
+        internal ApplicationEnvironment(IHostContext hostContext, CellLifeIdentity cellIdentity, SolutionHead solution, AssembliesHead assemblies, Action<IHostCommand> sendCommand)
         {
             _hostContext = hostContext;
-            _cellHandle = cellHandle;
+            _cellIdentity = cellIdentity;
+            _solution = solution;
+            _assemblies = assemblies;
             _sendCommand = sendCommand;
         }
 
@@ -36,29 +40,29 @@ namespace Lokad.Cloud.AppHost
             get { return _hostContext.Identity.UniqueWorkerInstanceName; }
         }
 
+        public string SolutionName
+        {
+            get { return _cellIdentity.SolutionName; }
+        }
+
         public string CellName
         {
-            get { return _cellHandle.CellName; }
+            get { return _cellIdentity.CellName; }
         }
 
         public string UniqueCellInstanceName
         {
-            get { return _cellHandle.CurrentIdentity.UniqueCellInstanceName; }
-        }
-
-        public string SolutionName
-        {
-            get { return _cellHandle.SolutionName; }
+            get { return _cellIdentity.UniqueCellInstanceName; }
         }
 
         public SolutionHead CurrentDeployment
         {
-            get { return _cellHandle.CurrentDeployment; }
+            get { return _solution; }
         }
 
         public AssembliesHead CurrentAssemblies
         {
-            get { return _cellHandle.CurrentAssemblies; }
+            get { return _assemblies; }
         }
 
         public void LoadDeployment(SolutionHead deployment)

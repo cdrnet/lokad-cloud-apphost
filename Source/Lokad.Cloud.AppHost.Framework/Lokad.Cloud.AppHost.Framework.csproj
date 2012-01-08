@@ -41,12 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyData.cs" />
-    <Compile Include="CellInstanceIdentity.cs" />
+    <Compile Include="CellLifeIdentity.cs" />
     <Compile Include="Definition\AssembliesHead.cs" />
     <Compile Include="Definition\CellDefinition.cs" />
     <Compile Include="Definition\SolutionDefinition.cs" />
     <Compile Include="Definition\SolutionHead.cs" />
-    <Compile Include="HostInstanceIdentity.cs" />
+    <Compile Include="HostLifeIdentity.cs" />
     <Compile Include="HostObserverSubject.cs" />
     <Compile Include="Commands\LoadCurrentHeadDeploymentCommand.cs" />
     <Compile Include="Commands\LoadDeploymentCommand.cs" />

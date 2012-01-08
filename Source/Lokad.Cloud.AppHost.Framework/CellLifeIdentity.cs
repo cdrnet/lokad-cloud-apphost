@@ -3,14 +3,14 @@
 namespace Lokad.Cloud.AppHost.Framework
 {
     [Serializable]
-    public class CellInstanceIdentity
+    public class CellLifeIdentity
     {
-        public HostInstanceIdentity Host { get; private set; }
+        public HostLifeIdentity Host { get; private set; }
         public string SolutionName { get; private set; }
         public string CellName { get; private set; }
         public string UniqueCellInstanceName { get; set; }
 
-        public CellInstanceIdentity(HostInstanceIdentity host, string solutionName, string cellName, string uniqueCellInstanceName)
+        public CellLifeIdentity(HostLifeIdentity host, string solutionName, string cellName, string uniqueCellInstanceName)
         {
             Host = host;
             SolutionName = solutionName;

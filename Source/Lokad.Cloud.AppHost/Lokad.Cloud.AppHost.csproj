@@ -45,7 +45,6 @@
     <Compile Include="DeploymentHeadPollingAgent.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="Util\InstrumentationExtensions.cs" />
-    <Compile Include="CellHandle.cs" />
     <Compile Include="ApplicationEnvironment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Cell.cs" />

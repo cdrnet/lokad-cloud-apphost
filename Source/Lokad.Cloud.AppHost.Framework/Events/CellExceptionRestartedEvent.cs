@@ -10,11 +10,11 @@ namespace Lokad.Cloud.AppHost.Framework.Events
     [Serializable]
     public class CellExceptionRestartedEvent : IHostEvent
     {
-        public CellInstanceIdentity Cell { get; private set; }
+        public CellLifeIdentity Cell { get; private set; }
         public Exception Exception { get; private set; }
         public bool FloodPrevention { get; private set; }
 
-        public CellExceptionRestartedEvent(CellInstanceIdentity cell, Exception exception, bool floodPrevention)
+        public CellExceptionRestartedEvent(CellLifeIdentity cell, Exception exception, bool floodPrevention)
         {
             Cell = cell;
             Exception = exception;
