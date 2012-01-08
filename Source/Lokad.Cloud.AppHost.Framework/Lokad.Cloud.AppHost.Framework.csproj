@@ -46,6 +46,8 @@
     <Compile Include="Definition\CellDefinition.cs" />
     <Compile Include="Definition\SolutionDefinition.cs" />
     <Compile Include="Definition\SolutionHead.cs" />
+    <Compile Include="Events\NewUnrelatedSolutionDetectedEvent.cs" />
+    <Compile Include="Events\NewDeploymentDetectedEvent.cs" />
     <Compile Include="HostLifeIdentity.cs" />
     <Compile Include="HostObserverSubject.cs" />
     <Compile Include="Commands\LoadCurrentHeadDeploymentCommand.cs" />

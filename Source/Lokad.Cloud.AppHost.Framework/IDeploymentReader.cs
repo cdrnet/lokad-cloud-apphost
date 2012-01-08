@@ -30,8 +30,8 @@ namespace Lokad.Cloud.AppHost.Framework
     /// <remarks>IMPORTANT: Implementations must be [Serializable].</remarks>
     public interface IDeploymentReader
     {
-        SolutionHead GetHeadIfModified(string knownETag, out string newETag);
-        SolutionDefinition GetDeployment(SolutionHead deployment);
+        SolutionHead GetDeploymentIfModified(string knownETag, out string newETag);
+        SolutionDefinition GetSolution(SolutionHead deployment);
         IEnumerable<AssemblyData> GetAssembliesAndSymbols(AssembliesHead assemblies);
 
         /// <summary>

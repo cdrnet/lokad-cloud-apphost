@@ -25,7 +25,7 @@ namespace Lokad.Cloud.AppHost
         private readonly DeploymentHeadPollingAgent _deploymentPollingAgent;
         
         private SolutionHead _currentDeployment;
-        private SolutionDefinition _currentDeploymentDefinition;
+        private SolutionDefinition _currentSolution;
 
         public Host(IHostContext context)
         {
@@ -42,7 +42,7 @@ namespace Lokad.Cloud.AppHost
             try
             {
                 _currentDeployment = null;
-                _currentDeploymentDefinition = null;
+                _currentSolution = null;
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     // 1. run agents
@@ -124,27 +124,27 @@ namespace Lokad.Cloud.AppHost
                 return;
             }
 
-            var current = _currentDeployment;
-            if (current != null && current.Equals(command.Deployment))
+            if (_currentDeployment != null && _currentDeployment.Equals(command.Deployment))
             {
                 // already on requested deployment
                 return;
             }
 
-            var newDeploymentDefinition = _hostContext.DeploymentReader.GetDeployment(command.Deployment);
-            if (newDeploymentDefinition == null)
+            var newSolution = _hostContext.DeploymentReader.GetSolution(command.Deployment);
+            if (newSolution == null)
             {
                 // TODO: NOTIFY/LOG invalid deployment
                 return;
             }
 
-            if (_currentDeploymentDefinition == null || !_currentDeploymentDefinition.Equals(newDeploymentDefinition))
+            if (_currentSolution == null || !_currentSolution.Equals(newSolution))
             {
-                OnDeploymentDefinitionChanged(newDeploymentDefinition, command.Deployment, cancellationToken);
+                _hostContext.Observer.TryNotify(() => new NewDeploymentDetectedEvent(_hostContext.Identity, command.Deployment, newSolution));
+                OnDeploymentChanged(command.Deployment, newSolution, cancellationToken);
             }
         }
 
-        void OnDeploymentDefinitionChanged(SolutionDefinition newDeploymentDefinition, SolutionHead newDeployment, CancellationToken cancellationToken)
+        void OnDeploymentChanged(SolutionHead newDeployment, SolutionDefinition newSolution, CancellationToken cancellationToken)
         {
             // 0. ANALYZE CELL LAYOUT CHANGES
 
@@ -153,17 +153,18 @@ namespace Lokad.Cloud.AppHost
             var remaining = new List<CellDefinition>();
 
             Dictionary<string, CellDefinition> old;
-            if (_currentDeploymentDefinition == null || _currentDeploymentDefinition.SolutionName != newDeploymentDefinition.SolutionName)
+            if (_currentSolution == null || _currentSolution.SolutionName != newSolution.SolutionName)
             {
                 // we do not reuse cells in completely unrelated solutions (i.e. solution name changed)
+                _hostContext.Observer.TryNotify(() => new NewUnrelatedSolutionDetectedEvent(_hostContext.Identity, newSolution));
                 old = new Dictionary<string, CellDefinition>();
-                added.AddRange(newDeploymentDefinition.Cells);
+                added.AddRange(newSolution.Cells);
             }
             else
             {
                 // keep remaining cells (only touch cells that actually change in some way)
-                old = _currentDeploymentDefinition.Cells.ToDictionary(cellDefinition => cellDefinition.CellName);
-                foreach (var newCellDefinition in newDeploymentDefinition.Cells)
+                old = _currentSolution.Cells.ToDictionary(cellDefinition => cellDefinition.CellName);
+                foreach (var newCellDefinition in newSolution.Cells)
                 {
                     if (old.ContainsKey(newCellDefinition.CellName))
                     {
@@ -179,7 +180,7 @@ namespace Lokad.Cloud.AppHost
 
             // 1. UPDATE
 
-            _currentDeploymentDefinition = newDeploymentDefinition;
+            _currentSolution = newSolution;
             _currentDeployment = newDeployment;
 
             // 2. REMOVE CELLS NO LONGER PRESENT
@@ -208,7 +209,7 @@ namespace Lokad.Cloud.AppHost
             foreach (var cellDefinition in added)
             {
                 var cellName = cellDefinition.CellName;
-                _cells.Add(cellName, Cell.Run(_hostContext, _commandQueue.Enqueue, cellDefinition, newDeployment, newDeploymentDefinition.SolutionName, cancellationToken));
+                _cells.Add(cellName, Cell.Run(_hostContext, _commandQueue.Enqueue, cellDefinition, newDeployment, newSolution.SolutionName, cancellationToken));
             }
         }
     }

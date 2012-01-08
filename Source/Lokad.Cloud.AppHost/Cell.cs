@@ -80,7 +80,7 @@ namespace Lokad.Cloud.AppHost
                         var lastRoundStartTime = currentRoundStartTime;
                         currentRoundStartTime = DateTimeOffset.UtcNow;
 
-                        var identity = _hostContext.GetNewUniqueCellIdentity(_solutionName, _cellName, _deployment);
+                        var identity = _hostContext.GetNewCellLifeIdentity(_solutionName, _cellName, _deployment);
 
                         AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + identity.UniqueCellInstanceName, null, AppDomain.CurrentDomain.SetupInformation);
                         try

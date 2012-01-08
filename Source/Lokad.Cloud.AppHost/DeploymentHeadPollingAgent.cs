@@ -27,7 +27,7 @@ namespace Lokad.Cloud.AppHost
         public void PollForChanges(SolutionHead currentlyLoadedDeoplyment = null)
         {
             string newEtag;
-            var head = _deploymentReader.GetHeadIfModified(_knownHeadEtag, out newEtag);
+            var head = _deploymentReader.GetDeploymentIfModified(_knownHeadEtag, out newEtag);
             if (head == null)
             {
                 if (_knownHead != null && currentlyLoadedDeoplyment != null && _knownHead.SolutionId != currentlyLoadedDeoplyment.SolutionId)

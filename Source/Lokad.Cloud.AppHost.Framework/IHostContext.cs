@@ -17,7 +17,7 @@ namespace Lokad.Cloud.AppHost.Framework
     public interface IHostContext
     {
         HostLifeIdentity Identity { get; }
-        CellLifeIdentity GetNewUniqueCellIdentity(string solutionName, string cellName, SolutionHead deployment);
+        CellLifeIdentity GetNewCellLifeIdentity(string solutionName, string cellName, SolutionHead deployment);
 
         string GetSettingValue(string settingName);
         X509Certificate2 GetCertificate(string thumbprint);
