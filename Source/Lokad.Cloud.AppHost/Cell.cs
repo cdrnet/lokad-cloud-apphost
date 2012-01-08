@@ -85,8 +85,6 @@ namespace Lokad.Cloud.AppHost
                         AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + identity.UniqueCellInstanceName, null, AppDomain.CurrentDomain.SetupInformation);
                         try
                         {
-                            //domain.UnhandledException += (sender, args) => observer.TryNotify(() => new CellExceptionRestartedEvent(args.ExceptionObject as Exception, _cellHandle.CellName, false));
-
                             try
                             {
                                 _entryPoint = (CellAppDomainEntryPoint)domain.CreateInstanceAndUnwrap(

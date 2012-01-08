@@ -30,37 +30,22 @@ namespace Lokad.Cloud.AppHost
             _sendCommand = sendCommand;
         }
 
-        public string WorkerName
+        public HostLifeIdentity Host
         {
-            get { return _hostContext.Identity.WorkerName; }
+            get { return _hostContext.Identity; }
         }
 
-        public string UniqueWorkerInstanceName
+        public CellLifeIdentity Cell
         {
-            get { return _hostContext.Identity.UniqueWorkerInstanceName; }
+            get { return _cellIdentity; }
         }
 
-        public string SolutionName
-        {
-            get { return _cellIdentity.SolutionName; }
-        }
-
-        public string CellName
-        {
-            get { return _cellIdentity.CellName; }
-        }
-
-        public string UniqueCellInstanceName
-        {
-            get { return _cellIdentity.UniqueCellInstanceName; }
-        }
-
-        public SolutionHead CurrentDeployment
+        public SolutionHead Deployment
         {
             get { return _solution; }
         }
 
-        public AssembliesHead CurrentAssemblies
+        public AssembliesHead Assemblies
         {
             get { return _assemblies; }
         }

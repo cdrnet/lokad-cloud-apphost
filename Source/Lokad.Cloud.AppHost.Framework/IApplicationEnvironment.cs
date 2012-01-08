@@ -11,15 +11,11 @@ namespace Lokad.Cloud.AppHost.Framework
 {
     public interface IApplicationEnvironment
     {
-        string WorkerName { get; }
-        string UniqueWorkerInstanceName { get; }
+        HostLifeIdentity Host { get; }
+        CellLifeIdentity Cell { get; }
 
-        string SolutionName { get; }
-        string CellName { get; }
-        string UniqueCellInstanceName { get; }
-
-        SolutionHead CurrentDeployment { get;  }
-        AssembliesHead CurrentAssemblies { get; }
+        SolutionHead Deployment { get;  }
+        AssembliesHead Assemblies { get; }
         void LoadDeployment(SolutionHead deployment);
         void LoadCurrentHeadDeployment();
 
