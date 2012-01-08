@@ -10,8 +10,11 @@ namespace Lokad.Cloud.AppHost.Framework.Events
     [Serializable]
     public class HostStoppedEvent : IHostEvent
     {
-        public HostStoppedEvent()
+        public HostInstanceIdentity Host { get; private set; }
+
+        public HostStoppedEvent(HostInstanceIdentity host)
         {
+            Host = host;
         }
     }
 }

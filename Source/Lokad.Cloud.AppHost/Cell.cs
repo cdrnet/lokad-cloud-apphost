@@ -77,7 +77,11 @@ namespace Lokad.Cloud.AppHost
                         var lastRoundStartTime = currentRoundStartTime;
                         currentRoundStartTime = DateTimeOffset.UtcNow;
 
-                        AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + _cellHandle.CellName, null, AppDomain.CurrentDomain.SetupInformation);
+                        _cellHandle.CurrentDeployment = _deployment;
+                        _cellHandle.CurrentAssemblies = _cellDefinition.Assemblies;
+                        _cellHandle.CurrentIdentity = _hostContext.GetNewUniqueCellIdentity(_cellHandle.SolutionName, _cellHandle.CellName, _deployment);
+
+                        AppDomain domain = AppDomain.CreateDomain("LokadCloudServiceRuntimeCell_" + _cellHandle.CurrentIdentity.UniqueCellInstanceName, null, AppDomain.CurrentDomain.SetupInformation);
                         try
                         {
                             //domain.UnhandledException += (sender, args) => observer.TryNotify(() => new CellExceptionRestartedEvent(args.ExceptionObject as Exception, _cellHandle.CellName, false));
@@ -91,7 +95,7 @@ namespace Lokad.Cloud.AppHost
                             catch (Exception exception)
                             {
                                 // Fatal Error
-                                observer.TryNotify(() => new CellFatalErrorRestartedEvent(exception, _cellHandle.CellName));
+                                observer.TryNotify(() => new CellFatalErrorRestartedEvent(_cellHandle.CurrentIdentity, exception));
                                 cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                                 continue;
                             }
@@ -100,12 +104,7 @@ namespace Lokad.Cloud.AppHost
                             var registration = cancellationToken.Register(_entryPoint.Cancel);
                             try
                             {
-                                observer.TryNotify(() => new CellStartedEvent(_cellHandle.CellName));
-
-                                _cellHandle.CurrentDeployment = _deployment;
-                                _cellHandle.CurretAssemblies = _cellDefinition.Assemblies;
-                                _cellHandle.CurrentUniqueCellInstanceName = _hostContext.GetNewUniqueCellInstanceName(_cellHandle.SolutionName, _cellHandle.CellName, _deployment);
-
+                                observer.TryNotify(() => new CellStartedEvent(_cellHandle.CurrentIdentity));
                                 _entryPoint.Run(_cellDefinition, _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, _cellHandle, _sendCommand));
                             }
                             catch (Exception exception)
@@ -113,26 +112,26 @@ namespace Lokad.Cloud.AppHost
                                 _entryPoint = null;
                                 if ((DateTimeOffset.UtcNow - lastRoundStartTime) < FloodFrequencyThreshold)
                                 {
-                                    observer.TryNotify(() => new CellExceptionRestartedEvent(exception, _cellHandle.CellName, true));
+                                    observer.TryNotify(() => new CellExceptionRestartedEvent(_cellHandle.CurrentIdentity, exception, true));
                                     cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                                 }
                                 else
                                 {
-                                    observer.TryNotify(() => new CellExceptionRestartedEvent(exception, _cellHandle.CellName, false));
+                                    observer.TryNotify(() => new CellExceptionRestartedEvent(_cellHandle.CurrentIdentity, exception, false));
                                 }
                                 continue;
                             }
                             finally
                             {
                                 _entryPoint = null;
-                                observer.TryNotify(() => new CellStoppedEvent(_cellHandle.CellName));
+                                observer.TryNotify(() => new CellStoppedEvent(_cellHandle.CurrentIdentity));
                                 registration.Dispose();
                             }
                         }
                         catch (Exception exception)
                         {
                             // Fatal Error
-                            observer.TryNotify(() => new CellFatalErrorRestartedEvent(exception, _cellHandle.CellName));
+                            observer.TryNotify(() => new CellFatalErrorRestartedEvent(_cellHandle.CurrentIdentity, exception));
                             cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                             continue;
                         }

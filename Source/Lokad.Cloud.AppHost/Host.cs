@@ -37,7 +37,7 @@ namespace Lokad.Cloud.AppHost
 
         public void RunSync(CancellationToken cancellationToken)
         {
-            _hostContext.Observer.TryNotify(() => new HostStartedEvent());
+            _hostContext.Observer.TryNotify(() => new HostStartedEvent(_hostContext.Identity));
 
             try
             {
@@ -62,7 +62,7 @@ namespace Lokad.Cloud.AppHost
             }
             finally
             {
-                _hostContext.Observer.TryNotify(() => new HostStoppedEvent());
+                _hostContext.Observer.TryNotify(() => new HostStoppedEvent(_hostContext.Identity));
             }
         }
 

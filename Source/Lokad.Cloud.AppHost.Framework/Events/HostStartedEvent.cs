@@ -10,8 +10,11 @@ namespace Lokad.Cloud.AppHost.Framework.Events
     [Serializable]
     public class HostStartedEvent : IHostEvent
     {
-        public HostStartedEvent()
+        public HostInstanceIdentity Host { get; private set; }
+
+        public HostStartedEvent(HostInstanceIdentity host)
         {
+            Host = host;
         }
     }
 }

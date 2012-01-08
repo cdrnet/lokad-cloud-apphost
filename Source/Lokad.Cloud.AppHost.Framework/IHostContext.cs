@@ -16,9 +16,8 @@ namespace Lokad.Cloud.AppHost.Framework
     /// <remarks>Implementation does not need to be serializable (other than the deployment reader).</remarks>
     public interface IHostContext
     {
-        string WorkerName { get; }
-        string UniqueWorkerInstanceName { get; }
-        string GetNewUniqueCellInstanceName(string solutionName, string cellName, SolutionHead deployment);
+        HostInstanceIdentity Identity { get; }
+        CellInstanceIdentity GetNewUniqueCellIdentity(string solutionName, string cellName, SolutionHead deployment);
 
         string GetSettingValue(string settingName);
         X509Certificate2 GetCertificate(string thumbprint);

@@ -28,12 +28,12 @@ namespace Lokad.Cloud.AppHost
 
         public string WorkerName
         {
-            get { return _hostContext.WorkerName; }
+            get { return _hostContext.Identity.WorkerName; }
         }
 
         public string UniqueWorkerInstanceName
         {
-            get { return _hostContext.UniqueWorkerInstanceName; }
+            get { return _hostContext.Identity.UniqueWorkerInstanceName; }
         }
 
         public string CellName
@@ -43,7 +43,7 @@ namespace Lokad.Cloud.AppHost
 
         public string UniqueCellInstanceName
         {
-            get { return _cellHandle.CurrentUniqueCellInstanceName; }
+            get { return _cellHandle.CurrentIdentity.UniqueCellInstanceName; }
         }
 
         public string SolutionName
@@ -58,7 +58,7 @@ namespace Lokad.Cloud.AppHost
 
         public AssembliesHead CurrentAssemblies
         {
-            get { return _cellHandle.CurretAssemblies; }
+            get { return _cellHandle.CurrentAssemblies; }
         }
 
         public void LoadDeployment(SolutionHead deployment)
