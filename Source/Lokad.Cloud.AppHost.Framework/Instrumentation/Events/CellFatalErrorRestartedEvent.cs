@@ -1,15 +1,18 @@
-﻿#region Copyright (c) Lokad 2011
+﻿#region Copyright (c) Lokad 2011-2012
 // This code is released under the terms of the new BSD licence.
 // URL: http://www.lokad.com/
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 {
     [Serializable]
     public class CellFatalErrorRestartedEvent : IHostEvent
     {
+        public HostEventLevel Level { get { return HostEventLevel.FatalError; } }
         public CellLifeIdentity Cell { get; private set; }
         public Exception Exception { get; private set; }
 
@@ -17,6 +20,33 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
         {
             Cell = cell;
             Exception = exception;
+        }
+
+        public string Describe()
+        {
+            return string.Format("Cell {0} of solution {1} fatal error: {2}.",
+                Cell.CellName, Cell.SolutionName, Exception != null ? Exception.Message : string.Empty);
+        }
+
+        public XElement[] DescribeMeta()
+        {
+            var meta = new List<XElement>(new[]
+                {
+                    new XElement("AppHost",
+                        new XElement("Host", Cell.Host.WorkerName),
+                        new XElement("Solution", Cell.SolutionName),
+                        new XElement("Cell", Cell.CellName))
+                });
+
+            if (Exception != null)
+            {
+                meta.Add(new XElement("Exception",
+                    new XAttribute("typeName", Exception.GetType().FullName),
+                    new XAttribute("message", Exception.Message),
+                    Exception.ToString()));
+            }
+
+            return meta.ToArray();
         }
     }
 }
