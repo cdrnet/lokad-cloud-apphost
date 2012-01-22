@@ -1,13 +1,22 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Lokad.Cloud.AppHost.Framework.Definition
 {
     [Serializable]
+    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/apphost/1.0")]
     public class CellDefinition : IEquatable<CellDefinition>
     {
+        [DataMember(Order = 1)]
         public string CellName { get; private set; }
+
+        [DataMember(Order = 2)]
         public AssembliesHead Assemblies { get; private set; }
+
+        [DataMember(Order = 3)]
         public string EntryPointTypeName { get; private set; }
+
+        [DataMember(Order = 4)]
         public string SettingsXml { get; private set; }
 
         public CellDefinition(string name, AssembliesHead assemblies, string entryPointTypeName, string settingsXml)

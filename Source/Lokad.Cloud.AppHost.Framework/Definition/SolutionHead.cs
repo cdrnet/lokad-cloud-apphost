@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Lokad.Cloud.AppHost.Framework.Definition
 {
     [Serializable]
+    [DataContract(Namespace = "http://schemas.lokad.com/lokad-cloud/apphost/1.0")]
     public class SolutionHead : IEquatable<SolutionHead>
     {
+        [DataMember(Order = 1)]
         public string SolutionId { get; private set; }
 
         public SolutionHead(string id)
