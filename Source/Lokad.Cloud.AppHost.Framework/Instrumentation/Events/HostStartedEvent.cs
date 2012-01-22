@@ -5,14 +5,14 @@
 
 using System;
 
-namespace Lokad.Cloud.AppHost.Framework.Events
+namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 {
     [Serializable]
-    public class HostStoppedEvent : IHostEvent
+    public class HostStartedEvent : IHostEvent
     {
         public HostLifeIdentity Host { get; private set; }
 
-        public HostStoppedEvent(HostLifeIdentity host)
+        public HostStartedEvent(HostLifeIdentity host)
         {
             Host = host;
         }

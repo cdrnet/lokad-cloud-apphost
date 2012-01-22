@@ -6,19 +6,17 @@
 using System;
 using Lokad.Cloud.AppHost.Framework.Definition;
 
-namespace Lokad.Cloud.AppHost.Framework.Events
+namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 {
     [Serializable]
-    public class NewDeploymentDetectedEvent : IHostEvent
+    public class NewUnrelatedSolutionDetectedEvent : IHostEvent
     {
         public HostLifeIdentity Host { get; private set; }
-        public SolutionHead Deployment { get; private set; }
         public SolutionDefinition Solution { get; private set; }
 
-        public NewDeploymentDetectedEvent(HostLifeIdentity host, SolutionHead deployment, SolutionDefinition solution)
+        public NewUnrelatedSolutionDetectedEvent(HostLifeIdentity host, SolutionDefinition solution)
         {
             Host = host;
-            Deployment = deployment;
             Solution = solution;
         }
     }

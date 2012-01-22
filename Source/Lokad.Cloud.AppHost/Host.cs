@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Lokad.Cloud.AppHost.Framework;
 using Lokad.Cloud.AppHost.Framework.Commands;
 using Lokad.Cloud.AppHost.Framework.Definition;
-using Lokad.Cloud.AppHost.Framework.Events;
+using Lokad.Cloud.AppHost.Framework.Instrumentation.Events;
 using Lokad.Cloud.AppHost.Util;
 
 namespace Lokad.Cloud.AppHost

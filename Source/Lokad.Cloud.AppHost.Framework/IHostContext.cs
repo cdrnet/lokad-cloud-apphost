@@ -6,6 +6,7 @@
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Lokad.Cloud.AppHost.Framework.Definition;
+using Lokad.Cloud.AppHost.Framework.Instrumentation;
 
 namespace Lokad.Cloud.AppHost.Framework
 {

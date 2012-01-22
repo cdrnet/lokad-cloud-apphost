@@ -3,12 +3,10 @@
 // URL: http://www.lokad.com/
 #endregion
 
-namespace Lokad.Cloud.AppHost.Framework
+namespace Lokad.Cloud.AppHost.Framework.Instrumentation
 {
-    /// <summary>
-    /// Host System Event (Instrumentation)
-    /// </summary>
-    public interface IHostEvent
+    public interface IHostObserver
     {
+        void Notify(IHostEvent @event);
     }
 }

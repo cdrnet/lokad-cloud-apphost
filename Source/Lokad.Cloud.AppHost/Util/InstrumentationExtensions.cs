@@ -4,7 +4,7 @@
 #endregion
 
 using System;
-using Lokad.Cloud.AppHost.Framework;
+using Lokad.Cloud.AppHost.Framework.Instrumentation;
 
 namespace Lokad.Cloud.AppHost.Util
 {

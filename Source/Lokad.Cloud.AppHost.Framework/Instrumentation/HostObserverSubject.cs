@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Lokad.Cloud.AppHost.Framework
+namespace Lokad.Cloud.AppHost.Framework.Instrumentation
 {
     /// <summary>
     /// Host system event observer that implements a hot Rx Observable, forwarding all events synchronously

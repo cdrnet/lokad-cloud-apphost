@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Lokad.Cloud.AppHost.Framework.Events
+namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 {
     [Serializable]
     public class CellExceptionRestartedEvent : IHostEvent
