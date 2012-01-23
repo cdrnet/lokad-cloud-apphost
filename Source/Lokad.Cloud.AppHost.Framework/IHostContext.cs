@@ -20,11 +20,10 @@ namespace Lokad.Cloud.AppHost.Framework
         HostLifeIdentity Identity { get; }
         CellLifeIdentity GetNewCellLifeIdentity(string solutionName, string cellName, SolutionHead deployment);
 
-        string GetSettingValue(string settingName);
-        X509Certificate2 GetCertificate(string thumbprint);
-        string GetLocalResourcePath(string resourceName);
-
-        IPEndPoint GetEndpoint(string endpointName);
+        string GetSettingValue(CellLifeIdentity cell, string settingName);
+        X509Certificate2 GetCertificate(CellLifeIdentity cell, string thumbprint);
+        string GetLocalResourcePath(CellLifeIdentity cell, string resourceName);
+        IPEndPoint GetEndpoint(CellLifeIdentity cell, string endpointName);
 
         int CurrentWorkerInstanceCount { get; }
         void ProvisionWorkerInstances(int numberOfInstances);
