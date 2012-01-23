@@ -2,10 +2,10 @@
 {
     public enum HostEventLevel
     {
-        Trace,
-        Information,
-        Warning,
-        Error,
-        FatalError
+        Trace = 1,
+        Information = 2,
+        Warning = 3,
+        Error = 4,
+        FatalError = 5
     }
 }

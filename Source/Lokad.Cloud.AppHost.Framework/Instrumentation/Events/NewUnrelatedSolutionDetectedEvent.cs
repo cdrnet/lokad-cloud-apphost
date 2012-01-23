@@ -28,14 +28,12 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
                 Solution.SolutionName, Host.WorkerName);
         }
 
-        public XElement[] DescribeMeta()
+        public XElement DescribeMeta()
         {
-            return new[]
-                {
-                    new XElement("AppHost",
-                        new XElement("Host", Host.WorkerName),
-                        new XElement("Solution", Solution.SolutionName))
-                };
+            return new XElement("Meta",
+                new XElement("AppHost",
+                    new XElement("Host", Host.WorkerName),
+                    new XElement("Solution", Solution.SolutionName)));
         }
     }
 }

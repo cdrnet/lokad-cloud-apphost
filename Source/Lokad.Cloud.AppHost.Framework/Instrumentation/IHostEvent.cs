@@ -14,6 +14,6 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation
     {
         HostEventLevel Level { get; }
         string Describe();
-        XElement[] DescribeMeta();
+        XElement DescribeMeta();
     }
 }

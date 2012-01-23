@@ -4,7 +4,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
@@ -30,15 +29,13 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
                 Cell.CellName, Cell.SolutionName, Exception != null ? Exception.Message : string.Empty);
         }
 
-        public XElement[] DescribeMeta()
+        public XElement DescribeMeta()
         {
-            var meta = new List<XElement>(new[]
-                {
-                    new XElement("AppHost",
-                        new XElement("Host", Cell.Host.WorkerName),
-                        new XElement("Solution", Cell.SolutionName),
-                        new XElement("Cell", Cell.CellName))
-                });
+            var meta = new XElement("Meta",
+                new XElement("AppHost",
+                    new XElement("Host", Cell.Host.WorkerName),
+                    new XElement("Solution", Cell.SolutionName),
+                    new XElement("Cell", Cell.CellName)));
 
             if (Exception != null)
             {
@@ -48,7 +45,7 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
                     Exception.ToString()));
             }
 
-            return meta.ToArray();
+            return meta;
         }
     }
 }

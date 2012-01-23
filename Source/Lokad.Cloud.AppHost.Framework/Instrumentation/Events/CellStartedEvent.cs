@@ -25,15 +25,13 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
                 Cell.CellName, Cell.SolutionName, Cell.Host.WorkerName);
         }
 
-        public XElement[] DescribeMeta()
+        public XElement DescribeMeta()
         {
-            return new[]
-                {
-                    new XElement("AppHost",
-                        new XElement("Host", Cell.Host.WorkerName),
-                        new XElement("Solution", Cell.SolutionName),
-                        new XElement("Cell", Cell.CellName))
-                };
+            return new XElement("Meta",
+                new XElement("AppHost",
+                    new XElement("Host", Cell.Host.WorkerName),
+                    new XElement("Solution", Cell.SolutionName),
+                    new XElement("Cell", Cell.CellName)));
         }
     }
 }

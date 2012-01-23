@@ -24,12 +24,10 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
             return string.Format("AppHost stopped on {0}.", Host.WorkerName);
         }
 
-        public XElement[] DescribeMeta()
+        public XElement DescribeMeta()
         {
-            return new[]
-                {
-                    new XElement("AppHost", new XElement("Host", Host.WorkerName))
-                };
+            return new XElement("Meta",
+                new XElement("AppHost", new XElement("Host", Host.WorkerName)));
         }
     }
 }
