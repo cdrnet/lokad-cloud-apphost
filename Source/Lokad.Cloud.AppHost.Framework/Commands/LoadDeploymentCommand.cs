@@ -8,6 +8,9 @@ using Lokad.Cloud.AppHost.Framework.Definition;
 
 namespace Lokad.Cloud.AppHost.Framework.Commands
 {
+    /// <summary>
+    /// Load a specific deployment, if not already loaded.
+    /// </summary>
     [Serializable]
     public sealed class LoadDeploymentCommand : IHostCommand
     {

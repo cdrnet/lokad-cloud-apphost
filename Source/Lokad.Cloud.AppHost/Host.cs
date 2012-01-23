@@ -21,18 +21,24 @@ namespace Lokad.Cloud.AppHost
     {
         private readonly IHostContext _hostContext;
         private readonly Dictionary<string, Cell> _cells;
-        private readonly ConcurrentQueue<IHostCommand> _commandQueue;
-        private readonly DeploymentHeadPollingAgent _deploymentPollingAgent;
-        
+        private readonly BlockingCollection<IHostCommand> _commandQueue;
+
+        private readonly int _autoLoadHeadDeploymentIntervalMs;
+        private readonly Timer _autoLoadHeadDeploymentTimer;
+
+        private string _currentDeploymentEtag;
         private SolutionHead _currentDeployment;
         private SolutionDefinition _currentSolution;
 
-        public Host(IHostContext context)
+        /// <param name="autoLoadHeadDeploymentIntervalMs">AutoLoad is disabled if set to Timeout.Infinite</param>
+        public Host(IHostContext context, int autoLoadHeadDeploymentIntervalMs = 30000)
         {
             _hostContext = context;
             _cells = new Dictionary<string, Cell>();
-            _commandQueue = new ConcurrentQueue<IHostCommand>();
-            _deploymentPollingAgent = new DeploymentHeadPollingAgent(context.DeploymentReader, _commandQueue.Enqueue);
+            _commandQueue = new BlockingCollection<IHostCommand>();
+
+            _autoLoadHeadDeploymentIntervalMs = autoLoadHeadDeploymentIntervalMs;
+            _autoLoadHeadDeploymentTimer = new Timer(o => _commandQueue.Add(new LoadCurrentHeadDeploymentCommand()), null, Timeout.Infinite, _autoLoadHeadDeploymentIntervalMs);
         }
 
         public void RunSync(CancellationToken cancellationToken)
@@ -43,25 +49,18 @@ namespace Lokad.Cloud.AppHost
             {
                 _currentDeployment = null;
                 _currentSolution = null;
-                while (!cancellationToken.IsCancellationRequested)
+                _currentDeploymentEtag = null;
+
+                _autoLoadHeadDeploymentTimer.Change(0, _autoLoadHeadDeploymentIntervalMs);
+
+                foreach (var command in _commandQueue.GetConsumingEnumerable(cancellationToken))
                 {
-                    // 1. run agents
-                    _deploymentPollingAgent.PollForChanges(_currentDeployment);
-
-                    // 2. apply all commands
-                    IHostCommand command;
-                    while (_commandQueue.TryDequeue(out command))
-                    {
-                        // dynamic dispatch, good enough for now
-                        Do((dynamic)command, cancellationToken);
-                    }
-
-                    // 3. repeat, but throttled
-                    cancellationToken.WaitHandle.WaitOne(TimeSpan.FromSeconds(30));
+                    Do((dynamic)command, cancellationToken);
                 }
             }
             finally
             {
+                _autoLoadHeadDeploymentTimer.Change(Timeout.Infinite, _autoLoadHeadDeploymentIntervalMs);
                 _hostContext.Observer.TryNotify(() => new HostStoppedEvent(_hostContext.Identity));
             }
         }
@@ -104,6 +103,11 @@ namespace Lokad.Cloud.AppHost
             return completionSource.Task;
         }
 
+        public void LoadHeadDeployment()
+        {
+            _commandQueue.Add(new LoadCurrentHeadDeploymentCommand());
+        }
+
         // Greatly simplified command handling for internal use only, can easily be refactored later if necessary
         // (pattern mainly used for simpler handling and queueing, not for cqs/cqrs-like ideas)
 
@@ -114,7 +118,27 @@ namespace Lokad.Cloud.AppHost
                 return;
             }
 
-            _deploymentPollingAgent.PollForChanges(_currentDeployment);
+            string newEtag;
+            var newDeployment = _hostContext.DeploymentReader.GetDeploymentIfModified(_currentDeploymentEtag, out newEtag);
+            if (newDeployment == null || newEtag == _currentDeploymentEtag)
+            {
+                return;
+            }
+
+            var newSolution = _hostContext.DeploymentReader.GetSolution(newDeployment);
+            if (newSolution == null)
+            {
+                // TODO: NOTIFY/LOG invalid deployment
+                return;
+            }
+
+            if (_currentSolution == null || !_currentSolution.Equals(newSolution))
+            {
+                _currentDeploymentEtag = null;
+                _hostContext.Observer.TryNotify(() => new NewDeploymentDetectedEvent(_hostContext.Identity, newDeployment, newSolution));
+                OnDeploymentChanged(newDeployment, newSolution, cancellationToken);
+                _currentDeploymentEtag = newEtag;
+            }
         }
 
         void Do(LoadDeploymentCommand command, CancellationToken cancellationToken)
@@ -139,6 +163,7 @@ namespace Lokad.Cloud.AppHost
 
             if (_currentSolution == null || !_currentSolution.Equals(newSolution))
             {
+                _currentDeploymentEtag = null;
                 _hostContext.Observer.TryNotify(() => new NewDeploymentDetectedEvent(_hostContext.Identity, command.Deployment, newSolution));
                 OnDeploymentChanged(command.Deployment, newSolution, cancellationToken);
             }
@@ -209,7 +234,7 @@ namespace Lokad.Cloud.AppHost
             foreach (var cellDefinition in added)
             {
                 var cellName = cellDefinition.CellName;
-                _cells.Add(cellName, Cell.Run(_hostContext, _commandQueue.Enqueue, cellDefinition, newDeployment, newSolution.SolutionName, cancellationToken));
+                _cells.Add(cellName, Cell.Run(_hostContext, _commandQueue.Add, cellDefinition, newDeployment, newSolution.SolutionName, cancellationToken));
             }
         }
     }
