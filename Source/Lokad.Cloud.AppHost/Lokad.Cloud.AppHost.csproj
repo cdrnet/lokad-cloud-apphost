@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="AssembyLoading\AssemblyLoader.cs" />
     <Compile Include="AssembyLoading\AssemblyResolver.cs" />
-    <Compile Include="DeploymentHeadPollingAgent.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="Util\InstrumentationExtensions.cs" />
     <Compile Include="ApplicationEnvironment.cs" />
