@@ -32,6 +32,8 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
         public XElement DescribeMeta()
         {
             var meta = new XElement("Meta",
+                new XElement("Component", "Lokad.Cloud.AppHost"),
+                new XElement("Event", "CellExceptionRestartedEvent"),
                 new XElement("AppHost",
                     new XElement("Host", Cell.Host.WorkerName),
                     new XElement("Solution", Cell.SolutionName),
