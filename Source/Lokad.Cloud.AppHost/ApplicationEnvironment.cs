@@ -99,5 +99,10 @@ namespace Lokad.Cloud.AppHost
         {
             _sendCommand(command);
         }
+
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
     }
 }

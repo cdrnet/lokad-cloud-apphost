@@ -59,5 +59,10 @@ namespace Lokad.Cloud.AppHost
         {
             _appEntryPoint.OnSettingsChanged(XElement.Parse(settingsXml));
         }
+
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
     }
 }

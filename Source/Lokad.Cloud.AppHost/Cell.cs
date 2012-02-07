@@ -5,6 +5,7 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.Remoting;
 using System.Threading;
 using System.Threading.Tasks;
 using Lokad.Cloud.AppHost.Framework;
@@ -101,10 +102,11 @@ namespace Lokad.Cloud.AppHost
 
                             // Forward cancellation token to AppDomain-internal cancellation token source
                             var registration = cancellationToken.Register(_entryPoint.Cancel);
+                            var environment = new ApplicationEnvironment(_hostContext, identity, _deployment, _cellDefinition.Assemblies, _sendCommand);
                             try
                             {
                                 observer.TryNotify(() => new CellStartedEvent(identity));
-                                _entryPoint.Run(_cellDefinition, _hostContext.DeploymentReader, new ApplicationEnvironment(_hostContext, identity, _deployment, _cellDefinition.Assemblies, _sendCommand));
+                                _entryPoint.Run(_cellDefinition, _hostContext.DeploymentReader, environment);
                             }
                             catch (Exception exception)
                             {
@@ -118,10 +120,10 @@ namespace Lokad.Cloud.AppHost
                                 {
                                     observer.TryNotify(() => new CellExceptionRestartedEvent(identity, exception, false));
                                 }
-                                continue;
                             }
                             finally
                             {
+                                RemotingServices.Disconnect(environment);
                                 _entryPoint = null;
                                 observer.TryNotify(() => new CellStoppedEvent(identity));
                                 registration.Dispose();
