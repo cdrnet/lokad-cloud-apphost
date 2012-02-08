@@ -14,17 +14,19 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
     {
         public HostEventLevel Level { get { return HostEventLevel.Information; } }
         public HostLifeIdentity Host { get; private set; }
+        public SolutionHead Deployment { get; private set; }
         public SolutionDefinition Solution { get; private set; }
 
-        public NewUnrelatedSolutionDetectedEvent(HostLifeIdentity host, SolutionDefinition solution)
+        public NewUnrelatedSolutionDetectedEvent(HostLifeIdentity host, SolutionHead deployment, SolutionDefinition solution)
         {
             Host = host;
+            Deployment = deployment;
             Solution = solution;
         }
 
         public string Describe()
         {
-            return string.Format("New unrelated solution {0} detected on {1}.",
+            return string.Format("AppHost: New solution {0} detected in new deployment on {1}.",
                 Solution.SolutionName, Host.WorkerName);
         }
 

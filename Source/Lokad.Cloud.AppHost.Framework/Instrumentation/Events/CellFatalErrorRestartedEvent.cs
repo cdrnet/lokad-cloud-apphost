@@ -23,8 +23,8 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 
         public string Describe()
         {
-            return string.Format("Cell {0} of solution {1} fatal error: {2}.",
-                Cell.CellName, Cell.SolutionName, Exception != null ? Exception.Message : string.Empty);
+            return string.Format("AppHost: Cell {0} of solution {1} fatal error on {2}: {3}.",
+                Cell.CellName, Cell.SolutionName, Cell.Host.WorkerName, Exception != null ? Exception.Message : string.Empty);
         }
 
         public XElement DescribeMeta()

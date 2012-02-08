@@ -48,7 +48,7 @@
     <Compile Include="Definition\SolutionDefinition.cs" />
     <Compile Include="Definition\SolutionHead.cs" />
     <Compile Include="Instrumentation\Events\NewUnrelatedSolutionDetectedEvent.cs" />
-    <Compile Include="Instrumentation\Events\NewDeploymentDetectedEvent.cs" />
+    <Compile Include="Instrumentation\Events\NewDeploymentOfSolutionDetectedEvent.cs" />
     <Compile Include="HostLifeIdentity.cs" />
     <Compile Include="Instrumentation\HostEventLevel.cs" />
     <Compile Include="Instrumentation\HostObserverSubject.cs" />

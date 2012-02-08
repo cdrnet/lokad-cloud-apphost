@@ -21,7 +21,7 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 
         public string Describe()
         {
-            return string.Format("Cell {0} of solution {1} started on {2}.",
+            return string.Format("AppHost: Cell {0} of solution {1} started on {2}.",
                 Cell.CellName, Cell.SolutionName, Cell.Host.WorkerName);
         }
 

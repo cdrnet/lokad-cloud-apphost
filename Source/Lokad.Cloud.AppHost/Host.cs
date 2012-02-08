@@ -103,13 +103,13 @@ namespace Lokad.Cloud.AppHost
             return completionSource.Task;
         }
 
+        /// <summary>
+        /// Request loading the head deployment. Note that deployments are only loaded automatically if the timer has not been disabled.
+        /// </summary>
         public void LoadHeadDeployment()
         {
             _commandQueue.Add(new LoadCurrentHeadDeploymentCommand());
         }
-
-        // Greatly simplified command handling for internal use only, can easily be refactored later if necessary
-        // (pattern mainly used for simpler handling and queueing, not for cqs/cqrs-like ideas)
 
         void Do(LoadCurrentHeadDeploymentCommand command, CancellationToken cancellationToken)
         {
@@ -128,14 +128,12 @@ namespace Lokad.Cloud.AppHost
             var newSolution = _hostContext.DeploymentReader.GetSolution(newDeployment);
             if (newSolution == null)
             {
-                // TODO: NOTIFY/LOG invalid deployment
                 return;
             }
 
             if (_currentSolution == null || !_currentSolution.Equals(newSolution))
             {
                 _currentDeploymentEtag = null;
-                _hostContext.Observer.TryNotify(() => new NewDeploymentDetectedEvent(_hostContext.Identity, newDeployment, newSolution));
                 OnDeploymentChanged(newDeployment, newSolution, cancellationToken);
                 _currentDeploymentEtag = newEtag;
             }
@@ -157,14 +155,12 @@ namespace Lokad.Cloud.AppHost
             var newSolution = _hostContext.DeploymentReader.GetSolution(command.Deployment);
             if (newSolution == null)
             {
-                // TODO: NOTIFY/LOG invalid deployment
                 return;
             }
 
             if (_currentSolution == null || !_currentSolution.Equals(newSolution))
             {
                 _currentDeploymentEtag = null;
-                _hostContext.Observer.TryNotify(() => new NewDeploymentDetectedEvent(_hostContext.Identity, command.Deployment, newSolution));
                 OnDeploymentChanged(command.Deployment, newSolution, cancellationToken);
             }
         }
@@ -181,13 +177,14 @@ namespace Lokad.Cloud.AppHost
             if (_currentSolution == null || _currentSolution.SolutionName != newSolution.SolutionName)
             {
                 // we do not reuse cells in completely unrelated solutions (i.e. solution name changed)
-                _hostContext.Observer.TryNotify(() => new NewUnrelatedSolutionDetectedEvent(_hostContext.Identity, newSolution));
+                _hostContext.Observer.TryNotify(() => new NewUnrelatedSolutionDetectedEvent(_hostContext.Identity, newDeployment, newSolution));
                 old = new Dictionary<string, CellDefinition>();
                 added.AddRange(newSolution.Cells);
             }
             else
             {
                 // keep remaining cells (only touch cells that actually change in some way)
+                _hostContext.Observer.TryNotify(() => new NewDeploymentOfSolutionDetectedEvent(_hostContext.Identity, newDeployment, newSolution));
                 old = _currentSolution.Cells.ToDictionary(cellDefinition => cellDefinition.CellName);
                 foreach (var newCellDefinition in newSolution.Cells)
                 {
@@ -221,11 +218,10 @@ namespace Lokad.Cloud.AppHost
 
             foreach (var newCellDefinition in remaining)
             {
-                var cellName = newCellDefinition.CellName;
-                var oldCellDefinition = old[cellName];
+                var oldCellDefinition = old[newCellDefinition.CellName];
                 if (!newCellDefinition.Equals(oldCellDefinition))
                 {
-                    _cells[cellName].OnCellDefinitionChanged(newCellDefinition, newDeployment);
+                    _cells[newCellDefinition.CellName].OnCellDefinitionChanged(newCellDefinition, newDeployment);
                 }
             }
 
