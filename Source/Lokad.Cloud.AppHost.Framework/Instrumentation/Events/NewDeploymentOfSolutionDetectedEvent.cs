@@ -26,7 +26,7 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 
         public string Describe()
         {
-            return string.Format("AppHost: New deployment detected for solution {0} on {1}.",
+            return string.Format("AppHost: New deployment detected for {0} solution on {1}.",
                 Solution.SolutionName, Host.WorkerName);
         }
 

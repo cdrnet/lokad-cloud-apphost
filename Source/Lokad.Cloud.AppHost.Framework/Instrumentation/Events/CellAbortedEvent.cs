@@ -23,7 +23,7 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 
         public string Describe()
         {
-            return string.Format("AppHost: Cell {0} of solution {1} on {2} exception while aborting: {3}.",
+            return string.Format("AppHost: Exception while aborting {0} cell of {1} solution on {2}: {3}.",
                 Cell.CellName, Cell.SolutionName, Cell.Host.WorkerName, Exception != null ? Exception.Message : string.Empty);
         }
 

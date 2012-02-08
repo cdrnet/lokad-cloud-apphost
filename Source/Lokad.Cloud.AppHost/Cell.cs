@@ -108,33 +108,29 @@ namespace Lokad.Cloud.AppHost
                                 observer.TryNotify(() => new CellStartedEvent(identity));
                                 _entryPoint.Run(_cellDefinition, _hostContext.DeploymentReader, environment);
                             }
+                            catch (ThreadAbortException exception)
+                            {
+                                Thread.ResetAbort();
+                                observer.TryNotify(() => new CellAbortedEvent(identity, exception));
+                            }
                             catch (Exception exception)
                             {
-                                if (exception is ThreadAbortException)
-                                {
-                                    // if the thread was aborted externally, then IsCancellationRequested must be true,
-                                    // assuming the external caller (e.g. Azure) behaves reasonably.
-
-                                    // if it was NOT aborted externally, we do want to restart the cell (see next if clause).
-
-                                    Thread.ResetAbort();
-                                }
-
                                 if (cancellationToken.IsCancellationRequested)
                                 {
                                     observer.TryNotify(() => new CellAbortedEvent(identity, exception));
-                                    return;
-                                }
-
-                                _entryPoint = null;
-                                if ((DateTimeOffset.UtcNow - lastRoundStartTime) < FloodFrequencyThreshold)
-                                {
-                                    observer.TryNotify(() => new CellExceptionRestartedEvent(identity, exception, true));
-                                    cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
                                 }
                                 else
                                 {
-                                    observer.TryNotify(() => new CellExceptionRestartedEvent(identity, exception, false));
+                                    _entryPoint = null;
+                                    if ((DateTimeOffset.UtcNow - lastRoundStartTime) < FloodFrequencyThreshold)
+                                    {
+                                        observer.TryNotify(() => new CellExceptionRestartedEvent(identity, exception, true));
+                                        cancellationToken.WaitHandle.WaitOne(DelayWhenFlooding);
+                                    }
+                                    else
+                                    {
+                                        observer.TryNotify(() => new CellExceptionRestartedEvent(identity, exception, false));
+                                    }
                                 }
                             }
                             finally

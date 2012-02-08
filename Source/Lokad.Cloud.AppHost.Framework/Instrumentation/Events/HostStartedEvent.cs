@@ -21,7 +21,7 @@ namespace Lokad.Cloud.AppHost.Framework.Instrumentation.Events
 
         public string Describe()
         {
-            return string.Format("AppHost: started on {0}.", Host.WorkerName);
+            return string.Format("AppHost: Started on {0}.", Host.WorkerName);
         }
 
         public XElement DescribeMeta()
