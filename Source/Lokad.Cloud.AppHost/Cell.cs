@@ -110,6 +110,22 @@ namespace Lokad.Cloud.AppHost
                             }
                             catch (Exception exception)
                             {
+                                if (exception is ThreadAbortException)
+                                {
+                                    // if the thread was aborted externally, then IsCancellationRequested must be true,
+                                    // assuming the external caller (e.g. Azure) behaves reasonably.
+
+                                    // if it was NOT aborted externally, we do want to restart the cell (see next if clause).
+
+                                    Thread.ResetAbort();
+                                }
+
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    observer.TryNotify(() => new CellAbortedEvent(identity, exception));
+                                    return;
+                                }
+
                                 _entryPoint = null;
                                 if ((DateTimeOffset.UtcNow - lastRoundStartTime) < FloodFrequencyThreshold)
                                 {

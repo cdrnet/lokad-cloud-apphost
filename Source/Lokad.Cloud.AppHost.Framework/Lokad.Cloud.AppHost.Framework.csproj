@@ -47,6 +47,7 @@
     <Compile Include="Definition\CellDefinition.cs" />
     <Compile Include="Definition\SolutionDefinition.cs" />
     <Compile Include="Definition\SolutionHead.cs" />
+    <Compile Include="Instrumentation\Events\CellAbortedEvent.cs" />
     <Compile Include="Instrumentation\Events\NewUnrelatedSolutionDetectedEvent.cs" />
     <Compile Include="Instrumentation\Events\NewDeploymentOfSolutionDetectedEvent.cs" />
     <Compile Include="HostLifeIdentity.cs" />
